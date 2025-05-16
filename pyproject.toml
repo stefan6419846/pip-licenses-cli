@@ -11,7 +11,9 @@ license = "MIT"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     {name = "raimon", email = "raimon49@hotmail.com"},
-    {name = "stefan6419846 (library version)"},
+]
+maintainers = [
+    {name = "stefan6419846"},
 ]
 keywords = ["pip", "pypi", "package", "license", "check"]
 classifiers = [
