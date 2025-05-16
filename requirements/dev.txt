@@ -112,8 +112,6 @@ pytest-cov==6.1.1
     # via pip-licenses (pyproject.toml)
 pytest-pycodestyle==2.4.1
     # via pip-licenses (pyproject.toml)
-pytest-runner==6.0.1
-    # via pip-licenses (pyproject.toml)
 readme-renderer==44.0
     # via twine
 requests==2.32.3
