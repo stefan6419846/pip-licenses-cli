@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=70.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pip-licenses-cli"
+description = "Dump the software license list of Python packages installed with pip."
+dynamic = ["version"]
+requires-python = ">=3.9, <4"
+license = "MIT"
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    {name = "raimon", email = "raimon49@hotmail.com"},
+    {name = "stefan6419846 (library version)"},
+]
+keywords = ["pip", "pypi", "package", "license", "check"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: System :: Systems Administration",
+    "Topic :: System :: System Shells",
+    "Typing :: Typed"
+]
+dependencies = [
+    "pip-licenses-lib >= 0.5.0",
+    "prettytable >= 3.13.0",
+    "tomli >= 2"
+]
+
+[project.optional-dependencies]
+dev = [
+    "autopep8",
+    "black",
+    "docutils",
+    "isort",
+    "wheel",
+    "mypy",
+    "pip-tools",
+    "pypandoc",
+    "pytest-cov",
+    "pytest-pycodestyle",
+    "pytest-runner",
+    "twine",
+    "tomli-w"
+]
+
+[project.urls]
+Homepage = "https://github.com/stefan6419846/pip-licenses-cli"
+Releases = "https://github.com/stefan6419846/pip-licenses-cli/releases"
+Issues = "https://github.com/stefan6419846/pip-licenses-cli/issues"
+
+[project.scripts]
+pip-licenses = "piplicenses:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "piplicenses",
+]
+namespaces = false
+
+[tool.setuptools.dynamic]
+version = {attr = "piplicenses.__version__"}
+
+[tool.pytest.ini_options]
+addopts = "--pycodestyle -v --cov --cov-report term-missing"
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+line_length = 72
+known_first_party = ["piplicenses"]
+profile = "black"
+
+[tool.mypy]
+exclude = ["venv"]
+
+[tool.coverage.run]
+branch = true
+include = ["piplicenses/*"]
