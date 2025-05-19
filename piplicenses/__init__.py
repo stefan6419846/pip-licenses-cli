@@ -35,7 +35,6 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Type, cast
 
-import tomli
 from piplicenses_lib import (
     LICENSE_UNKNOWN,
     FromArg,
@@ -46,6 +45,11 @@ from piplicenses_lib import (
     normalize_package_name,
 )
 from prettytable import HRuleStyle, PrettyTable
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Iterator, Optional, Sequence
@@ -719,7 +723,7 @@ class SelectAction(argparse.Action):
 def load_config_from_file(pyproject_path: str):
     if Path(pyproject_path).exists():
         with open(pyproject_path, "rb") as f:
-            return tomli.load(f).get("tool", {}).get(__pkgname__, {})
+            return tomllib.load(f).get("tool", {}).get(__pkgname__, {})
     return {}
 
 
