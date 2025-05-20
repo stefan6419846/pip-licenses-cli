@@ -56,10 +56,15 @@ if TYPE_CHECKING:
         from email.message import Message as PackageMetadata
 
 
-with open("tests/fixtures/unicode_characters.txt", encoding="utf-8") as f:
-    # Read from external file considering a terminal that cannot handle "emoji"
-    UNICODE_APPENDIX = f.readline().replace("\n", "")
+TESTS_PATH = Path(__file__).resolve().parent
+FIXTURES_PATH = TESTS_PATH / "fixtures"
 
+# Read from external file considering a terminal that cannot handle "emoji"
+UNICODE_APPENDIX = (
+    FIXTURES_PATH.joinpath("unicode_characters.txt")
+    .read_text(encoding="utf-8")
+    .replace("\n", "")
+)
 
 importlib_metadata_distributions_orig = (
     piplicenses_lib.importlib_metadata.distributions
@@ -675,9 +680,7 @@ class TestGetLicenses(CommandLineTestCase):
             ["--filter-strings", "--filter-code-page=ascii"]
         )
         packages = list(piplicenses.get_packages(args))
-        self.assertNotIn(
-            UNICODE_APPENDIX, packages[-1].distribution.metadata["summary"]
-        )
+        self.assertNotIn(UNICODE_APPENDIX, packages[-1].summary)
 
     def test_case_insensitive_set_diff(self) -> None:
         set_a = {"MIT License"}
