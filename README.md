@@ -38,7 +38,7 @@ Execute the command with your venv (or virtualenv) environment.
  pytz    2017.3   MIT
 ```
 
-For further details, see [the detailed docs](https://github.com/stefan6419846/pip-licenses-lib/blob/master/USAGE.md).
+For further details, see [the detailed docs](https://github.com/stefan6419846/pip-licenses-cli/blob/master/USAGE.md).
 
 ## About UnicodeEncodeError
 
