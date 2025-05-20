@@ -82,3 +82,8 @@ exclude = ["venv"]
 [tool.coverage.run]
 branch = true
 include = ["piplicenses/*"]
+
+[tool.codespell]
+skip = './.git/*,./.mypy*,./venv*,./docs/_build/*,'
+check-hidden = true
+ignore-words-list = 'assertIn,'

@@ -2,7 +2,7 @@
 
 ## Design policy
 
-The design policy of `pip-licenses` is as follows.
+The design policy of `pip-licenses-cli` is as follows.
 
 * Focus only on outputting license information of Python packages installed in user's environment.
 * Support Python 3.9 or later.
@@ -21,7 +21,7 @@ The design policy of `pip-licenses` is as follows.
 
 ## Implementation and testing
 
-* `pip-licenses` always measures code coverage for code quality. If you implement the new feature, please also write unit test.
+* `pip-licenses-cli` always measures code coverage for code quality. If you implement the new feature, please also write unit test.
     * Tests can be run with `make test` .
 * Code conventions follow the [PEP 8](https://www.python.org/dev/peps/pep-0008/).
     * You can format the code by running `make lint` .

@@ -1,4 +1,4 @@
-# pip-licenses-lib
+# pip-licenses-cli
 #
 # MIT License
 #
@@ -108,6 +108,7 @@ FIELDS_TO_METADATA_KEYS = {
     "LicenseText": "license_texts",
     "NoticeFile": "notice_files",
     "NoticeText": "notice_texts",
+    "Description": "summary",
 }
 
 
@@ -247,9 +248,6 @@ def create_licenses_table(
                 )
             elif hasattr(pkg, field.lower()):
                 row.append(cast(str, getattr(pkg, field.lower())))
-            elif field.lower() == "description":
-                # TODO: Include in library.
-                row.append(cast(str, pkg.distribution.metadata["summary"]))
             else:
                 value = getattr(pkg, FIELDS_TO_METADATA_KEYS[field])
                 if field in {
