@@ -133,6 +133,14 @@ tomli-w==1.2.0
     # via pip-licenses (pyproject.toml)
 twine==6.1.0
     # via pip-licenses (pyproject.toml)
+types-colorama==0.4.15.20240311
+    # via pip-licenses (pyproject.toml)
+types-docutils==0.21.0.20250526
+    # via pip-licenses (pyproject.toml)
+types-pexpect==4.9.0.20250516
+    # via pip-licenses (pyproject.toml)
+types-pygments==2.19.0.20250516
+    # via pip-licenses (pyproject.toml)
 typing-extensions==4.13.2
     # via mypy
 urllib3==2.4.0
