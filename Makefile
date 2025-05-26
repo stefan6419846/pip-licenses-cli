@@ -40,7 +40,7 @@ update-depends:
 lint:
 	$(VENV_NAME)/bin/python -m black .
 	$(VENV_NAME)/bin/python -m isort .
-	$(VENV_NAME)/bin/python -m mypy --non-interactive .
+	$(VENV_NAME)/bin/python -m mypy .
 
 .PHONY: test
 test:

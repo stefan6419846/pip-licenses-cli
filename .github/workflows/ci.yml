@@ -33,4 +33,4 @@ jobs:
           pytest --pycodestyle -v --cov --cov-report=xml
       - name: Validate static typing with mypy
         run:
-          mypy --non-interactive .
+          mypy .
