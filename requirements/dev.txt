@@ -22,9 +22,9 @@ click==8.1.8
     # via
     #   black
     #   pip-tools
-coverage[toml]==7.8.0
+coverage[toml]==7.8.2
     # via pytest-cov
-cryptography==44.0.3
+cryptography==45.0.3
     # via secretstorage
 docutils==0.21.2
     # via
@@ -133,6 +133,14 @@ tomli-w==1.2.0
     # via pip-licenses (pyproject.toml)
 twine==6.1.0
     # via pip-licenses (pyproject.toml)
+types-colorama==0.4.15.20240311
+    # via pip-licenses (pyproject.toml)
+types-docutils==0.21.0.20250526
+    # via pip-licenses (pyproject.toml)
+types-pexpect==4.9.0.20250516
+    # via pip-licenses (pyproject.toml)
+types-pygments==2.19.0.20250516
+    # via pip-licenses (pyproject.toml)
 typing-extensions==4.13.2
     # via mypy
 urllib3==2.4.0
@@ -145,7 +153,7 @@ wheel==0.45.1
     # via
     #   pip-licenses (pyproject.toml)
     #   pip-tools
-zipp==3.21.0
+zipp==3.22.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

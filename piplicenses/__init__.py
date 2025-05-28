@@ -1,4 +1,4 @@
-# pip-licenses-lib
+# pip-licenses-cli
 #
 # MIT License
 #
@@ -35,7 +35,6 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Type, cast
 
-import tomli
 from piplicenses_lib import (
     LICENSE_UNKNOWN,
     FromArg,
@@ -47,6 +46,11 @@ from piplicenses_lib import (
 )
 from prettytable import HRuleStyle, PrettyTable
 
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Iterator, Optional, Sequence
 
@@ -57,7 +61,7 @@ if TYPE_CHECKING:  # pragma: no cover
 open = open  # allow monkey patching
 
 __pkgname__ = "pip-licenses-cli"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __summary__ = (
     "Dump the software license list of Python packages installed with pip."
 )
@@ -104,6 +108,7 @@ FIELDS_TO_METADATA_KEYS = {
     "LicenseText": "license_texts",
     "NoticeFile": "notice_files",
     "NoticeText": "notice_texts",
+    "Description": "summary",
 }
 
 
@@ -243,9 +248,6 @@ def create_licenses_table(
                 )
             elif hasattr(pkg, field.lower()):
                 row.append(cast(str, getattr(pkg, field.lower())))
-            elif field.lower() == "description":
-                # TODO: Include in library.
-                row.append(cast(str, pkg.distribution.metadata["summary"]))
             else:
                 value = getattr(pkg, FIELDS_TO_METADATA_KEYS[field])
                 if field in {
@@ -719,7 +721,7 @@ class SelectAction(argparse.Action):
 def load_config_from_file(pyproject_path: str):
     if Path(pyproject_path).exists():
         with open(pyproject_path, "rb") as f:
-            return tomli.load(f).get("tool", {}).get(__pkgname__, {})
+            return tomllib.load(f).get("tool", {}).get(__pkgname__, {})
     return {}
 
 

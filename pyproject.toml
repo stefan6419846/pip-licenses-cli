@@ -28,7 +28,7 @@ classifiers = [
 dependencies = [
     "pip-licenses-lib >= 0.5.0",
     "prettytable >= 3.13.0",
-    "tomli >= 2"
+    "tomli >= 2; python_version < '3.11'",
 ]
 
 [project.optional-dependencies]
@@ -44,7 +44,11 @@ dev = [
     "pytest-cov",
     "pytest-pycodestyle",
     "twine",
-    "tomli-w"
+    "tomli-w",
+    "types-colorama",
+    "types-docutils",
+    "types-pexpect",
+    "types-pygments",
 ]
 
 [project.urls]
@@ -82,3 +86,8 @@ exclude = ["venv"]
 [tool.coverage.run]
 branch = true
 include = ["piplicenses/*"]
+
+[tool.codespell]
+skip = './.git/*,./.mypy*,./venv*,./docs/_build/*,'
+check-hidden = true
+ignore-words-list = 'assertIn,'
