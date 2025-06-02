@@ -27,7 +27,9 @@ from __future__ import annotations
 
 import argparse
 import codecs
+import functools
 import sys
+import warnings
 from collections import Counter
 from dataclasses import asdict
 from enum import Enum, auto
@@ -129,14 +131,16 @@ class SpdxParser(Protocol):
     def __call__(self, expression: str) -> set[str]: ...
 
 
+@functools.lru_cache(maxsize=1)
 def _get_spdx_parser() -> SpdxParser:
     """
     Create an SPDX expression parser.
 
-    If the extra "spdx" is not installed, then the parser just returns a set with the provided expression as only element.
+    If the extra "spdx" is not installed, then the parser just returns a set
+    with the provided expression as only element.
     """
     try:
-        from license_expression import Licensing
+        from license_expression import get_spdx_licensing
 
     except ImportError:
 
@@ -148,16 +152,26 @@ def _get_spdx_parser() -> SpdxParser:
     SYSTEM_PACKAGES.append("license_expression")
     SYSTEM_PACKAGES.append("boolean-py")
 
-    licensing = Licensing()
+    licensing = get_spdx_licensing()
 
     def parser(expression: str) -> set[str]:
         try:
-            parsed = licensing.parse(expression)
-        except Exception:
+            result = licensing.validate(expression)
+        except Exception as exception:
             # https://github.com/aboutcode-org/license-expression/issues/97
             return {expression}
-
+        if result.errors:
+            return {expression}
+        parsed = licensing.parse(expression)
         if parsed is None:
+            return {expression}
+        parsed = parsed.simplify()
+        if "AND" in str(parsed) or "WITH" in str(parsed):
+            warnings.warn(
+                "SPDX expressions with 'AND' or 'WITH' are currently not "
+                f"supported. The expression {parsed} is treated as the "
+                f"literal '{expression}'."
+            )
             return {expression}
         return {license for license in parsed.objects}
 
