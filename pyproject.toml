@@ -36,6 +36,7 @@ spdx = [
     "license-expression >= 30.4.1",
 ]
 dev = [
+    "pip-licenses-cli[spdx]",
     "autopep8",
     "black",
     "cryptography==45.0.3",
