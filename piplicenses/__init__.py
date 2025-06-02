@@ -113,7 +113,7 @@ FIELDS_TO_METADATA_KEYS = {
 }
 
 
-SYSTEM_PACKAGES = (
+SYSTEM_PACKAGES = [
     __pkgname__,
     "pip",
     "pip-licenses-lib",
@@ -123,9 +123,9 @@ SYSTEM_PACKAGES = (
     "wheel",
     "license-expression",
     "boolean-py",
-)
+]
 if sys.version_info < (3, 11):
-    SYSTEM_PACKAGES = SYSTEM_PACKAGES + ("tomli",)
+    SYSTEM_PACKAGES.append("tomli")
 
 
 def get_packages(
