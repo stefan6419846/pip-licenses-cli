@@ -249,7 +249,9 @@ def _parse_spdx(
     """Parse a license expression and return a set of licenses."""
     try:
         parsed = _SPDX_LICENSING.parse(expression)
-    except Exception:
+    except (
+        Exception
+    ):  # see https://github.com/aboutcode-org/license-expression/issues/97
         return {expression}
 
     if parsed is None:
