@@ -226,7 +226,7 @@ def get_packages(
                     parsed_license_names, allow_only_licenses
                 )
 
-            if len(uncommon_licenses) == len(parsed_license_names):
+            if uncommon_licenses:
                 sys.stderr.write(
                     "license {} not in allow-only licenses was found"
                     " for package {}:{}\n".format(
