@@ -1,0 +1,3 @@
+class Expression:
+    @property
+    def objects(self) -> set[str]: ...

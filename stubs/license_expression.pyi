@@ -1,0 +1,6 @@
+from boolean import Expression
+
+class ExpressionError(Exception): ...
+
+class Licensing:
+    def parse(self, expression: str) -> Expression | None: ...

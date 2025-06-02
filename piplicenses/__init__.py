@@ -35,6 +35,7 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Type, cast
 
+from license_expression import ExpressionError, Licensing
 from piplicenses_lib import (
     LICENSE_UNKNOWN,
     FromArg,
@@ -120,6 +121,8 @@ SYSTEM_PACKAGES = (
     "wcwidth",
     "setuptools",
     "wheel",
+    "license-expression",
+    "boolean-py",
 )
 if sys.version_info < (3, 11):
     SYSTEM_PACKAGES = SYSTEM_PACKAGES + ("tomli",)
@@ -185,14 +188,22 @@ def get_packages(
 
                 setattr(pkg_info, key, _handle(value))
 
+        parsed_license_names: set[str] = set()
+        for license_expr in pkg_info.license_names:
+            parsed_license_names |= (
+                _parse_spdx(license_expr)
+                if _is_valid_spdx(license_expr)
+                else {license_expr}
+            )
+
         if fail_on_licenses:
             if not args.partial_match:
                 failed_licenses = case_insensitive_set_intersect(
-                    pkg_info.license_names, fail_on_licenses
+                    parsed_license_names, fail_on_licenses
                 )
             else:
                 failed_licenses = case_insensitive_partial_match_set_intersect(
-                    pkg_info.license_names, fail_on_licenses
+                    parsed_license_names, fail_on_licenses
                 )
             if failed_licenses:
                 sys.stderr.write(
@@ -208,14 +219,14 @@ def get_packages(
         if allow_only_licenses:
             if not args.partial_match:
                 uncommon_licenses = case_insensitive_set_diff(
-                    pkg_info.license_names, allow_only_licenses
+                    parsed_license_names, allow_only_licenses
                 )
             else:
                 uncommon_licenses = case_insensitive_partial_match_set_diff(
-                    pkg_info.license_names, allow_only_licenses
+                    parsed_license_names, allow_only_licenses
                 )
 
-            if len(uncommon_licenses) == len(pkg_info.license_names):
+            if len(uncommon_licenses) == len(parsed_license_names):
                 sys.stderr.write(
                     "license {} not in allow-only licenses was found"
                     " for package {}:{}\n".format(
@@ -227,6 +238,26 @@ def get_packages(
                 sys.exit(1)
 
         yield pkg_info
+
+
+def _is_valid_spdx(spdx_expression: str) -> bool:
+    """Check if the license expression is valid."""
+    try:
+        Licensing().parse(spdx_expression)
+        return True
+    except ExpressionError:
+        return False
+
+
+def _parse_spdx(
+    expression: str,
+) -> set[str]:
+    """Parse a license expression and return a set of licenses."""
+    licensing = Licensing()
+    parsed = licensing.parse(expression)
+    if parsed is None:
+        return set()
+    return {license for license in parsed.objects}
 
 
 def create_licenses_table(

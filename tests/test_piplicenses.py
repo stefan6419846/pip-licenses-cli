@@ -188,6 +188,18 @@ class TestGetLicenses(CommandLineTestCase):
         license_notation_as_meta = "MIT"
         self.assertIn(license_notation_as_meta, license_columns)
 
+    def test_with_spdx_license_in_meta(self) -> None:
+        from_args = ["--from=meta"]
+        args = self.parser.parse_args(from_args)
+        output_fields = get_output_fields(args)
+        table = create_licenses_table(args, output_fields)
+
+        self.assertIn("License", output_fields)
+
+        license_columns = self._create_license_columns(table, output_fields)
+        license_notation_as_classifier = "Apache-2.0 OR BSD-3-Clause"
+        self.assertIn(license_notation_as_classifier, license_columns)
+
     def test_from_classifier(self) -> None:
         from_args = ["--from=classifier"]
         args = self.parser.parse_args(from_args)
@@ -247,10 +259,13 @@ class TestGetLicenses(CommandLineTestCase):
         table = create_licenses_table(args)
 
         pkg_name_columns = self._create_pkg_name_columns(table)
+        pkg_names = list(
+            map(piplicenses_lib.normalize_package_name, pkg_name_columns)
+        )
         external_sys_pkgs = list(SYSTEM_PACKAGES)
         external_sys_pkgs.remove(__pkgname__)
         for sys_pkg in external_sys_pkgs:
-            self.assertIn(sys_pkg, pkg_name_columns)
+            self.assertIn(sys_pkg, pkg_names)
 
     def test_with_authors(self) -> None:
         with_authors_args = ["--with-authors"]
