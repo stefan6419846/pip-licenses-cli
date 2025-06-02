@@ -885,6 +885,16 @@ def test_fail_on(monkeypatch, capsys) -> None:
     )
 
 
+def test_spdx_clause_is_parsed(monkeypatch, capsys) -> None:
+    licenses = ("Apache-2.0 OR BSD-3-Clause",)
+    allow_only_args = ["--fail-on={}".format(";".join(licenses))]
+    args = create_parser().parse_args(allow_only_args)
+    create_licenses_table(args)
+
+    captured = capsys.readouterr()
+    assert "" == captured.err
+
+
 def test_fail_on_partial_match(monkeypatch, capsys) -> None:
     licenses = ("MIT",)
     allow_only_args = [

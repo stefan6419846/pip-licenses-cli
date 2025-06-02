@@ -35,6 +35,7 @@ dependencies = [
 dev = [
     "autopep8",
     "black",
+    "cryptography==45.0.3",
     "docutils",
     "isort",
     "wheel",
