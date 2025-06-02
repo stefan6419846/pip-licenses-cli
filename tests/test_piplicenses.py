@@ -900,20 +900,19 @@ def test_fail_on(monkeypatch, capsys) -> None:
     )
 
 
-def test_spdx_or_clause_succeeds_if_both_licenses_are_allowed(
-    monkeypatch, capsys
-) -> None:
+def test_spdx_or_clause_succeeds_if_either_license_is_allowed(capsys) -> None:
     # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     licenses = ("Apache-2.0", "BSD-3-Clause")
-    spdx_args_success = [
-        "--allow-only={}".format(";".join(licenses)),
-        "--packages=cryptography",
-    ]
-    args = create_parser().parse_args(spdx_args_success)
-    create_licenses_table(args)
+    for license in licenses:
+        spdx_args_success = [
+            "--allow-only={}".format(license),
+            "--packages=cryptography",
+        ]
+        args = create_parser().parse_args(spdx_args_success)
+        create_licenses_table(args)
 
-    captured = capsys.readouterr()
-    assert "" == captured.err
+        captured = capsys.readouterr()
+        assert "" == captured.err
 
 
 def test_spdx_or_clause_fails_if_either_license_is_not_allowed(
