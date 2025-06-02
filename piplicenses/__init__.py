@@ -119,9 +119,10 @@ SYSTEM_PACKAGES = (
     "prettytable",
     "wcwidth",
     "setuptools",
-    "tomli",
     "wheel",
 )
+if sys.version_info < (3, 11):
+    SYSTEM_PACKAGES = SYSTEM_PACKAGES + ("tomli",)
 
 
 def get_packages(
