@@ -33,9 +33,8 @@ from dataclasses import asdict
 from enum import Enum, auto
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Type, cast
+from typing import TYPE_CHECKING, Protocol, Type, cast
 
-from license_expression import ExpressionError, Licensing
 from piplicenses_lib import (
     LICENSE_UNKNOWN,
     FromArg,
@@ -121,18 +120,51 @@ SYSTEM_PACKAGES = [
     "wcwidth",
     "setuptools",
     "wheel",
-    "license-expression",
-    "boolean-py",
 ]
 if sys.version_info < (3, 11):
     SYSTEM_PACKAGES.append("tomli")
 
 
-def _get_spdx_licensing() -> Licensing:
-    return Licensing()
+class SpdxParser(Protocol):
+    def __call__(self, expression: str) -> set[str]: ...
 
 
-_SPDX_LICENSING = _get_spdx_licensing()
+def _get_spdx_parser() -> SpdxParser:
+    """
+    Create an SPDX expression parser.
+
+    If the extra "spdx" is not installed, then the parser just returns a set with the provided expression as only element.
+    """
+    try:
+        from license_expression import Licensing
+
+    except ImportError:
+
+        def dummy_parser(expression: str) -> set[str]:
+            return {expression}
+
+        return dummy_parser
+
+    SYSTEM_PACKAGES.append("license_expression")
+    SYSTEM_PACKAGES.append("boolean-py")
+
+    licensing = Licensing()
+
+    def parser(expression: str) -> set[str]:
+        try:
+            parsed = licensing.parse(expression)
+        except Exception:
+            # https://github.com/aboutcode-org/license-expression/issues/97
+            return {expression}
+
+        if parsed is None:
+            return {expression}
+        return {license for license in parsed.objects}
+
+    return parser
+
+
+_SPDX_PARSER = _get_spdx_parser()
 
 
 def get_packages(
@@ -247,16 +279,7 @@ def _parse_spdx(
     expression: str,
 ) -> set[str]:
     """Parse a license expression and return a set of licenses."""
-    try:
-        parsed = _SPDX_LICENSING.parse(expression)
-    except (
-        Exception
-    ):  # see https://github.com/aboutcode-org/license-expression/issues/97
-        return {expression}
-
-    if parsed is None:
-        return {expression}
-    return {license for license in parsed.objects}
+    return _SPDX_PARSER(expression)
 
 
 def create_licenses_table(
