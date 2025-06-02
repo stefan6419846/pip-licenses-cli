@@ -149,7 +149,7 @@ def _get_spdx_parser() -> SpdxParser:
 
         return dummy_parser
 
-    SYSTEM_PACKAGES.append("license_expression")
+    SYSTEM_PACKAGES.append("license-expression")
     SYSTEM_PACKAGES.append("boolean-py")
 
     licensing = get_spdx_licensing()
