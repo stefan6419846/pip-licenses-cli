@@ -128,6 +128,13 @@ if sys.version_info < (3, 11):
     SYSTEM_PACKAGES.append("tomli")
 
 
+def _get_spdx_licensing() -> Licensing:
+    return Licensing()
+
+
+_SPDX_LICENSING = _get_spdx_licensing()
+
+
 def get_packages(
     args: CustomNamespace,
 ) -> Iterator[PackageInfo]:
@@ -190,11 +197,7 @@ def get_packages(
 
         parsed_license_names: set[str] = set()
         for license_expr in pkg_info.license_names:
-            parsed_license_names |= (
-                _parse_spdx(license_expr)
-                if _is_valid_spdx(license_expr)
-                else {license_expr}
-            )
+            parsed_license_names |= _parse_spdx(license_expr)
 
         if fail_on_licenses:
             if not args.partial_match:
@@ -240,23 +243,17 @@ def get_packages(
         yield pkg_info
 
 
-def _is_valid_spdx(spdx_expression: str) -> bool:
-    """Check if the license expression is valid."""
-    try:
-        Licensing().parse(spdx_expression)
-        return True
-    except ExpressionError:
-        return False
-
-
 def _parse_spdx(
     expression: str,
 ) -> set[str]:
     """Parse a license expression and return a set of licenses."""
-    licensing = Licensing()
-    parsed = licensing.parse(expression)
+    try:
+        parsed = _SPDX_LICENSING.parse(expression)
+    except Exception:
+        return {expression}
+
     if parsed is None:
-        return set()
+        return {expression}
     return {license for license in parsed.objects}
 
 
