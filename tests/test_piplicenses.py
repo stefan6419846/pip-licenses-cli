@@ -900,14 +900,38 @@ def test_fail_on(monkeypatch, capsys) -> None:
     )
 
 
-def test_spdx_clause_is_parsed(monkeypatch, capsys) -> None:
-    licenses = ("Apache-2.0 OR BSD-3-Clause",)
-    allow_only_args = ["--fail-on={}".format(";".join(licenses))]
-    args = create_parser().parse_args(allow_only_args)
+def test_spdx_or_clause_succeeds_if_both_licenses_are_allowed(
+    monkeypatch, capsys
+) -> None:
+    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
+    licenses = ("Apache-2.0", "BSD-3-Clause")
+    spdx_args_success = [
+        "--allow-only={}".format(";".join(licenses)),
+        "--packages=cryptography",
+    ]
+    args = create_parser().parse_args(spdx_args_success)
     create_licenses_table(args)
 
     captured = capsys.readouterr()
     assert "" == captured.err
+
+
+def test_spdx_or_clause_fails_if_either_license_is_not_allowed(
+    monkeypatch, capsys
+) -> None:
+    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
+    licenses = ("Apache-2.0", "BSD-3-Clause")
+    monkeypatch.setattr(sys, "exit", lambda n: None)
+    for license in licenses:
+        spdx_args_failure = [
+            "--fail-on={}".format(license),
+            "--packages=cryptography",
+        ]
+        args = create_parser().parse_args(spdx_args_failure)
+        create_licenses_table(args)
+
+        captured = capsys.readouterr()
+        assert "fail-on license" in captured.err
 
 
 def test_fail_on_partial_match(monkeypatch, capsys) -> None:
