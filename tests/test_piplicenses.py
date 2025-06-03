@@ -903,7 +903,7 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     captured = capsys.readouterr()
     assert "" == captured.out
     assert (
-        "fail-on license MIT License was found for " "package" in captured.err
+        "fail-on license MIT License was found for package" in captured.err
     )
 
 
@@ -911,9 +911,6 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     "expression",
     ["Apache-2.0", "BSD-3-Clause"],
     ids=["Apache-2.0", "BSD-3-Clause"],
-)
-@pytest.mark.skipif(
-    license_expression is None, reason="Requires license-expression package."
 )
 def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
     expression: str,
@@ -923,13 +920,20 @@ def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
     # cryptography has an "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     monkeypatch.setattr(sys, "exit", lambda n: None)
     spdx_args_success = [
-        f"--allow-only={expression}" "--packages=cryptography",
+        f"--allow-only={expression}",
+        "--packages=cryptography",
     ]
     args = create_parser().parse_args(spdx_args_success)
     create_licenses_table(args)
 
     captured = capsys.readouterr()
-    assert captured.err == ""
+    if license_expression is not None:
+        assert captured.err == ""
+    else:
+        assert captured.err == (
+            "license Apache-2.0 OR BSD-3-Clause not in allow-only licenses"
+            " was found for package cryptography:45.0.2\n"
+        )
 
 
 @pytest.mark.parametrize(
@@ -953,7 +957,10 @@ def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
     if license_expression is None:
         assert captured.err == ""
     else:
-        assert "fail-on license" in captured.err
+        assert captured.err == (
+            f"fail-on license {expression} was found for package "
+            f"cryptography:45.0.2\n"
+        )
 
 
 @pytest.mark.parametrize(
