@@ -41,3 +41,4 @@ jobs:
       - name: Report coverage
         run: |
           python -m coverage report --fail-under=100
+        if: ${{ matrix.python != '3.9' }}
