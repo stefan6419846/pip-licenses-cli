@@ -23,6 +23,11 @@ import tomli_w
 from prettytable import HRuleStyle
 from pytest import CaptureFixture, MonkeyPatch
 
+try:
+    import license_expression
+except ImportError:
+    license_expression = None  # type: ignore[assignment]
+
 import piplicenses
 from piplicenses import (
     DEFAULT_OUTPUT_FIELDS,
@@ -68,6 +73,8 @@ UNICODE_APPENDIX = (
     .replace("\n", "")
 )
 
+CRYPTOGRAPHY_VERSION = Distribution.from_name("cryptography").version
+
 importlib_metadata_distributions_orig = (
     piplicenses_lib.importlib_metadata.distributions
 )
@@ -112,6 +119,7 @@ class CommandLineTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        super().setUpClass()
         cls.parser = create_parser()
 
 
@@ -618,7 +626,7 @@ class TestGetLicenses(CommandLineTestCase):
         self.assertNotIn("Name", output_string)
 
         warn_string = create_warn_string(args)
-        self.assertTrue(len(warn_string) == 0)
+        self.assertEqual("", warn_string)
 
     def test_summary_sort_by_count(self) -> None:
         summary_args = ["--summary", "--order=count"]
@@ -708,8 +716,8 @@ class TestGetLicenses(CommandLineTestCase):
         b_diff_c = case_insensitive_set_diff(set_b, set_c)
         a_diff_empty = case_insensitive_set_diff(set_a, set())
 
-        self.assertTrue(len(a_diff_b) == 0)
-        self.assertTrue(len(a_diff_c) == 0)
+        self.assertSetEqual(set(), a_diff_b)
+        self.assertSetEqual(set(), a_diff_c)
         self.assertIn("BSD License", b_diff_c)
         self.assertIn("MIT License", a_diff_empty)
 
@@ -722,10 +730,10 @@ class TestGetLicenses(CommandLineTestCase):
         b_intersect_c = case_insensitive_set_intersect(set_b, set_c)
         a_intersect_empty = case_insensitive_set_intersect(set_a, set())
 
-        self.assertTrue(set_a == a_intersect_b)
-        self.assertTrue(set_a == a_intersect_c)
-        self.assertTrue({"revised BSD"} == b_intersect_c)
-        self.assertTrue(len(a_intersect_empty) == 0)
+        self.assertSetEqual(set_a, a_intersect_b)
+        self.assertSetEqual(set_a, a_intersect_c)
+        self.assertSetEqual({"revised BSD"}, b_intersect_c)
+        self.assertSetEqual(set(), a_intersect_empty)
 
     def test_case_insensitive_partial_match_set_diff(self) -> None:
         set_a = {"MIT License"}
@@ -736,8 +744,8 @@ class TestGetLicenses(CommandLineTestCase):
         b_diff_c = case_insensitive_partial_match_set_diff(set_b, set_c)
         a_diff_empty = case_insensitive_partial_match_set_diff(set_a, set())
 
-        self.assertTrue(len(a_diff_b) == 0)
-        self.assertTrue(len(a_diff_c) == 0)
+        self.assertSetEqual(set(), a_diff_b)
+        self.assertSetEqual(set(), a_diff_c)
         self.assertIn("BSD License", b_diff_c)
         self.assertIn("MIT License", a_diff_empty)
 
@@ -758,10 +766,10 @@ class TestGetLicenses(CommandLineTestCase):
             set_a, set()
         )
 
-        self.assertTrue(set_a == a_intersect_b)
-        self.assertTrue(set_a == a_intersect_c)
-        self.assertTrue({"revised BSD"} == b_intersect_c)
-        self.assertTrue(len(a_intersect_empty) == 0)
+        self.assertSetEqual(set_a, a_intersect_b)
+        self.assertSetEqual(set_a, a_intersect_c)
+        self.assertSetEqual({"revised BSD"}, b_intersect_c)
+        self.assertSetEqual(set(), a_intersect_empty)
 
 
 def test_output_file_success(monkeypatch, capsys) -> None:
@@ -897,54 +905,110 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
 
     captured = capsys.readouterr()
     assert "" == captured.out
-    assert (
-        "fail-on license MIT License was found for " "package" in captured.err
-    )
+    assert "fail-on license MIT License was found for package" in captured.err
 
 
+@pytest.mark.parametrize(
+    "expression",
+    ["Apache-2.0", "BSD-3-Clause"],
+    ids=["Apache-2.0", "BSD-3-Clause"],
+)
 def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
+    expression: str,
+    monkeypatch: MonkeyPatch,
     capsys: CaptureFixture,
 ) -> None:
-    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
-    licenses = ("Apache-2.0", "BSD-3-Clause")
-    for license in licenses:
-        spdx_args_success = [
-            "--allow-only={}".format(license),
-            "--packages=cryptography",
-        ]
-        args = create_parser().parse_args(spdx_args_success)
-        create_licenses_table(args)
-
-        captured = capsys.readouterr()
-        assert "" == captured.err
-
-
-def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
-    monkeypatch: MonkeyPatch, capsys: CaptureFixture
-) -> None:
-    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
-    licenses = ("Apache-2.0", "BSD-3-Clause")
+    # cryptography has an "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     monkeypatch.setattr(sys, "exit", lambda n: None)
-    for license in licenses:
-        spdx_args_failure = [
-            "--fail-on={}".format(license),
-            "--packages=cryptography",
-        ]
-        args = create_parser().parse_args(spdx_args_failure)
-        create_licenses_table(args)
+    spdx_args_success = [
+        f"--allow-only={expression}",
+        "--packages=cryptography",
+    ]
+    args = create_parser().parse_args(spdx_args_success)
+    create_licenses_table(args)
 
-        captured = capsys.readouterr()
-        assert "fail-on license" in captured.err
+    captured = capsys.readouterr()
+    if license_expression is not None:
+        assert captured.err == ""
+    else:
+        assert captured.err == (
+            f"license Apache-2.0 OR BSD-3-Clause not in allow-only licenses"
+            f" was found for package cryptography:{CRYPTOGRAPHY_VERSION}\n"
+        )
 
 
-def test_spdx_parser_raises_warning_for_operator_and() -> None:
-    with pytest.warns(PipLicensesWarning):
-        _get_spdx_parser()("Apache-2.0 AND BSD-3-Clause")
+@pytest.mark.parametrize(
+    "expression",
+    ["Apache-2.0", "BSD-3-Clause"],
+    ids=["Apache-2.0", "BSD-3-Clause"],
+)
+def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
+    expression: str, monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    # cryptography has an "Apache-2.0 OR BSD-3-Clause" license SPDX expression
+    monkeypatch.setattr(sys, "exit", lambda n: None)
+    spdx_args_failure = [
+        f"--fail-on={expression}",
+        "--packages=cryptography",
+    ]
+    args = create_parser().parse_args(spdx_args_failure)
+    create_licenses_table(args)
+
+    captured = capsys.readouterr()
+    if license_expression is None:
+        assert captured.err == ""
+    else:
+        assert captured.err == (
+            f"fail-on license {expression} was found for package "
+            f"cryptography:{CRYPTOGRAPHY_VERSION}\n"
+        )
 
 
-def test_spdx_parser_raises_warning_for_operator_with() -> None:
-    with pytest.warns(PipLicensesWarning):
-        _get_spdx_parser()("GPL-2.0-or-later WITH Bison-exception-2.2")
+@pytest.mark.parametrize(
+    "expression",
+    [
+        "GPL-2.0-or-later WITH Bison-exception-2.2",
+        "Apache-2.0 AND BSD-3-Clause",
+        "Apache-2.0 OR BSD-3-Clause",
+        "Hello World",
+        "",
+    ],
+    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX", "Empty"],
+)
+@pytest.mark.skipif(
+    license_expression is not None,
+    reason="Does not work with license-expression package.",
+)
+def test_spdx_parser(expression: str) -> None:
+    assert _get_spdx_parser()(expression) == {expression}
+
+
+@pytest.mark.parametrize(
+    "expression,expected,should_warn",
+    [
+        (
+            "GPL-2.0-or-later WITH Bison-exception-2.2",
+            {"GPL-2.0-or-later WITH Bison-exception-2.2"},
+            True,
+        ),
+        ("Apache-2.0 AND BSD-3-Clause", {"Apache-2.0 AND BSD-3-Clause"}, True),
+        ("Apache-2.0 OR BSD-3-Clause", {"Apache-2.0", "BSD-3-Clause"}, False),
+        ("Hello World", {"Hello World"}, False),
+        ("", {""}, False),
+    ],
+    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX", "Empty"],
+)
+@pytest.mark.skipif(
+    license_expression is None, reason="Requires license-expression package."
+)
+def test_spdx_parser__license_expression(
+    expression: str, expected: set[str], should_warn: bool
+) -> None:
+    if should_warn:
+        with pytest.warns(PipLicensesWarning):
+            assert _get_spdx_parser()(expression) == expected
+    else:
+        assert _get_spdx_parser()(expression) == expected
 
 
 def test_fail_on_partial_match(monkeypatch, capsys) -> None:
@@ -992,27 +1056,27 @@ def test_verify_args(
     parser: CompatibleArgumentParser, capsys: CaptureFixture
 ) -> None:
     # --with-license-file missing
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--no-license-path"])
     capture = capsys.readouterr().err
     for arg in ("--no-license-path", "--with-license-file"):
         assert arg in capture
 
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--with-notice-file"])
     capture = capsys.readouterr().err
     for arg in ("--with-notice-file", "--with-license-file"):
         assert arg in capture
 
     # --filter-strings missing
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--filter-code-page=utf8"])
     capture = capsys.readouterr().err
     for arg in ("--filter-code-page", "--filter-strings"):
         assert arg in capture
 
     # invalid code-page
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--filter-strings", "--filter-code-page=XX"])
     capture = capsys.readouterr().err
     for arg in ("invalid code", "--filter-code-page"):

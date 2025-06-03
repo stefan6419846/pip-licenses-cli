@@ -33,13 +33,13 @@ dependencies = [
 
 [project.optional-dependencies]
 spdx = [
-    "license-expression >= 30.4.1",
+    "license-expression",
 ]
 dev = [
     "pip-licenses-cli[spdx]",
     "autopep8",
     "black",
-    "cryptography==45.0.3",
+    "cryptography >= 45.0.3",
     "docutils",
     "isort",
     "wheel",
