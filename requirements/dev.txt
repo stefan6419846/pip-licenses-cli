@@ -111,7 +111,7 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pytest==8.3.5
+pytest==8.4.0
     # via
     #   pytest-cov
     #   pytest-pycodestyle
