@@ -902,9 +902,7 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
 
     captured = capsys.readouterr()
     assert "" == captured.out
-    assert (
-        "fail-on license MIT License was found for package" in captured.err
-    )
+    assert "fail-on license MIT License was found for package" in captured.err
 
 
 @pytest.mark.parametrize(
