@@ -63,7 +63,7 @@ if TYPE_CHECKING:  # pragma: no cover
 open = open  # allow monkey patching
 
 __pkgname__ = "pip-licenses-cli"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __summary__ = (
     "Dump the software license list of Python packages installed with pip."
 )
