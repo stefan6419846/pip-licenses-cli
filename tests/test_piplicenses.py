@@ -73,6 +73,8 @@ UNICODE_APPENDIX = (
     .replace("\n", "")
 )
 
+CRYPTOGRAPHY_VERSION = Distribution.from_name("cryptography").version
+
 importlib_metadata_distributions_orig = (
     piplicenses_lib.importlib_metadata.distributions
 )
@@ -929,8 +931,8 @@ def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
         assert captured.err == ""
     else:
         assert captured.err == (
-            "license Apache-2.0 OR BSD-3-Clause not in allow-only licenses"
-            " was found for package cryptography:45.0.2\n"
+            f"license Apache-2.0 OR BSD-3-Clause not in allow-only licenses"
+            f" was found for package cryptography:{CRYPTOGRAPHY_VERSION}\n"
         )
 
 
@@ -957,7 +959,7 @@ def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
     else:
         assert captured.err == (
             f"fail-on license {expression} was found for package "
-            f"cryptography:45.0.2\n"
+            f"cryptography:{CRYPTOGRAPHY_VERSION}\n"
         )
 
 
@@ -968,8 +970,9 @@ def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
         "Apache-2.0 AND BSD-3-Clause",
         "Apache-2.0 OR BSD-3-Clause",
         "Hello World",
+        "",
     ],
-    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX"],
+    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX", "Empty"],
 )
 @pytest.mark.skipif(
     license_expression is not None,
@@ -990,8 +993,9 @@ def test_spdx_parser(expression: str) -> None:
         ("Apache-2.0 AND BSD-3-Clause", {"Apache-2.0 AND BSD-3-Clause"}, True),
         ("Apache-2.0 OR BSD-3-Clause", {"Apache-2.0", "BSD-3-Clause"}, False),
         ("Hello World", {"Hello World"}, False),
+        ("", {""}, False)
     ],
-    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX"],
+    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX", "Empty"],
 )
 @pytest.mark.skipif(
     license_expression is None, reason="Requires license-expression package."
