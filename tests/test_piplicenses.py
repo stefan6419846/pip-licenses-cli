@@ -993,7 +993,7 @@ def test_spdx_parser(expression: str) -> None:
         ("Apache-2.0 AND BSD-3-Clause", {"Apache-2.0 AND BSD-3-Clause"}, True),
         ("Apache-2.0 OR BSD-3-Clause", {"Apache-2.0", "BSD-3-Clause"}, False),
         ("Hello World", {"Hello World"}, False),
-        ("", {""}, False)
+        ("", {""}, False),
     ],
     ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX", "Empty"],
 )
