@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import codecs
 import functools
+import re
 import sys
 import warnings
 from collections import Counter
@@ -127,6 +128,12 @@ if sys.version_info < (3, 11):
     SYSTEM_PACKAGES.append("tomli")
 
 
+class PipLicensesWarning(UserWarning):
+    """
+    Base class for warnings emitted by the pip-licenses-cli package.
+    """
+
+
 class SpdxParser(Protocol):
     def __call__(self, expression: str) -> set[str]: ...
 
@@ -166,19 +173,18 @@ def _get_spdx_parser() -> SpdxParser:
         if parsed is None:
             return {expression}
         parsed = parsed.simplify()
-        if "AND" in str(parsed) or "WITH" in str(parsed):
+        if re.search("AND|WITH", str(parsed)):
             warnings.warn(
                 "SPDX expressions with 'AND' or 'WITH' are currently not "
                 f"supported. The expression {parsed} is treated as the "
-                f"literal '{expression}'."
+                f"literal '{expression}'.",
+                category=PipLicensesWarning,
+                stacklevel=2,
             )
             return {expression}
         return {license for license in parsed.objects}
 
     return parser
-
-
-_SPDX_PARSER = _get_spdx_parser()
 
 
 def get_packages(
@@ -293,7 +299,7 @@ def _parse_spdx(
     expression: str,
 ) -> set[str]:
     """Parse a license expression and return a set of licenses."""
-    return _SPDX_PARSER(expression)
+    return _get_spdx_parser()(expression)
 
 
 def create_licenses_table(

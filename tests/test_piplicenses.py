@@ -20,8 +20,8 @@ import docutils.utils
 import piplicenses_lib
 import pytest
 import tomli_w
-from _pytest.capture import CaptureFixture
 from prettytable import HRuleStyle
+from pytest import CaptureFixture, MonkeyPatch
 
 import piplicenses
 from piplicenses import (
@@ -29,7 +29,9 @@ from piplicenses import (
     SYSTEM_PACKAGES,
     CompatibleArgumentParser,
     FromArg,
+    PipLicensesWarning,
     __pkgname__,
+    _get_spdx_parser,
     case_insensitive_partial_match_set_diff,
     case_insensitive_partial_match_set_intersect,
     case_insensitive_set_diff,
@@ -886,7 +888,7 @@ def test_different_python() -> None:
     assert package_names == expected_packages
 
 
-def test_fail_on(monkeypatch, capsys) -> None:
+def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     licenses = ("MIT license",)
     allow_only_args = ["--fail-on={}".format(";".join(licenses))]
     monkeypatch.setattr(sys, "exit", lambda n: None)
@@ -900,7 +902,9 @@ def test_fail_on(monkeypatch, capsys) -> None:
     )
 
 
-def test_spdx_or_clause_succeeds_if_either_license_is_allowed(capsys) -> None:
+def test_spdx_operator_OR_succeeds_if_either_license_is_allowed(
+    capsys: CaptureFixture,
+) -> None:
     # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     licenses = ("Apache-2.0", "BSD-3-Clause")
     for license in licenses:
@@ -915,8 +919,8 @@ def test_spdx_or_clause_succeeds_if_either_license_is_allowed(capsys) -> None:
         assert "" == captured.err
 
 
-def test_spdx_or_clause_fails_if_either_license_is_not_allowed(
-    monkeypatch, capsys
+def test_spdx_operator_OR_fails_if_either_license_is_not_allowed(
+    monkeypatch: MonkeyPatch, capsys: CaptureFixture
 ) -> None:
     # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     licenses = ("Apache-2.0", "BSD-3-Clause")
@@ -931,6 +935,16 @@ def test_spdx_or_clause_fails_if_either_license_is_not_allowed(
 
         captured = capsys.readouterr()
         assert "fail-on license" in captured.err
+
+
+def test_spdx_parser_raises_warning_for_operator_AND() -> None:
+    with pytest.warns(PipLicensesWarning):
+        _get_spdx_parser()("Apache-2.0 AND BSD-3-Clause")
+
+
+def test_spdx_parser_raises_warning_for_operator_WITH() -> None:
+    with pytest.warns(PipLicensesWarning):
+        _get_spdx_parser()("GPL-2.0-or-later WITH Bison-exception-2.2")
 
 
 def test_fail_on_partial_match(monkeypatch, capsys) -> None:
