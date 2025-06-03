@@ -6,8 +6,7 @@ Dump the software license list of Python packages installed with *pip*.
 
 `pip-licenses-cli` is a CLI tool for checking the software licenses of installed Python packages with pip.
 
-Implemented with the idea inspired by `composer licenses` command in Composer (a.k.a PHP package management tool).
-
+Implemented with the idea inspired by `composer licenses` command in Composer (a.k.a PHP package management tool):
 https://getcomposer.org/doc/03-cli.md#licenses
 
 This is a fork of the original [pip-licenses](https://github.com/raimon49/pip-licenses) project. While `pip-licenses-cli` provides a CLI,
@@ -48,9 +47,10 @@ For further details, see [the detailed docs](https://github.com/stefan6419846/pi
 
 ## About UnicodeEncodeError
 
-If a `UnicodeEncodeError` occurs, check your environment variables `LANG` and `LC_TYPE`. Additionally, you can set `PYTHONIOENCODING` to override the encoding used for `stdout`.
+If a `UnicodeEncodeError` occurs, check your environment variables `LANG` and `LC_TYPE`.
+Additionally, you can set `PYTHONIOENCODING` to override the encoding used for `stdout`.
 
-Often occurs in isolated environments such as Docker and tox.
+This mostly occurs in isolated environments such as Docker and tox.
 
 See useful reports:
 
@@ -63,8 +63,13 @@ See useful reports:
 
 * [pip-licenses-cli](https://pypi.org/project/pip-licenses-cli/) by the same authors as the CLI (MIT License).
 * [prettytable](https://pypi.org/project/prettytable/) by Luke Maurits, subject to the BSD-3-Clause License.
-    * **Note:** This package implicitly requires [wcwidth](https://pypi.org/project/wcwidth/) (MIT License).
+    * **Note:** This package implicitly requires [wcwidth](https://pypi.org/project/wcwidth/) by Jeff Quast (MIT License).
 * For Python < 3.11: [tomli](https://pypi.org/project/tomli/) by Taneli Hukkinen under the MIT License.
+
+If you are using SPDX support with the `spdx` extra, the following additional dependencies are required:
+
+* [license-expression](https://pypi.org/project/license-expression/) by nexB Inc. under the Apache-2.0 License.
+* [boolean.py](https://pypi.org/project/boolean.py/) by Sebastian Krämer under the BSD-2-Clause License.
 
 ## Contributing
 

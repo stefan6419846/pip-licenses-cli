@@ -23,6 +23,11 @@ import tomli_w
 from prettytable import HRuleStyle
 from pytest import CaptureFixture, MonkeyPatch
 
+try:
+    import license_expression
+except ImportError:
+    license_expression = None  # type: ignore[assignment]
+
 import piplicenses
 from piplicenses import (
     DEFAULT_OUTPUT_FIELDS,
@@ -902,49 +907,98 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     )
 
 
+@pytest.mark.parametrize(
+    "expression",
+    ["Apache-2.0", "BSD-3-Clause"],
+    ids=["Apache-2.0", "BSD-3-Clause"],
+)
+@pytest.mark.skipif(
+    license_expression is None, reason="Requires license-expression package."
+)
 def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
+    expression: str,
+    monkeypatch: MonkeyPatch,
     capsys: CaptureFixture,
 ) -> None:
-    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
-    licenses = ("Apache-2.0", "BSD-3-Clause")
-    for license in licenses:
-        spdx_args_success = [
-            "--allow-only={}".format(license),
-            "--packages=cryptography",
-        ]
-        args = create_parser().parse_args(spdx_args_success)
-        create_licenses_table(args)
-
-        captured = capsys.readouterr()
-        assert "" == captured.err
-
-
-def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
-    monkeypatch: MonkeyPatch, capsys: CaptureFixture
-) -> None:
-    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
-    licenses = ("Apache-2.0", "BSD-3-Clause")
+    # cryptography has an "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     monkeypatch.setattr(sys, "exit", lambda n: None)
-    for license in licenses:
-        spdx_args_failure = [
-            "--fail-on={}".format(license),
-            "--packages=cryptography",
-        ]
-        args = create_parser().parse_args(spdx_args_failure)
-        create_licenses_table(args)
+    spdx_args_success = [
+        f"--allow-only={expression}" "--packages=cryptography",
+    ]
+    args = create_parser().parse_args(spdx_args_success)
+    create_licenses_table(args)
 
-        captured = capsys.readouterr()
+    captured = capsys.readouterr()
+    assert captured.err == ""
+
+
+@pytest.mark.parametrize(
+    "expression",
+    ["Apache-2.0", "BSD-3-Clause"],
+    ids=["Apache-2.0", "BSD-3-Clause"],
+)
+def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
+    expression: str, monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    # cryptography has an "Apache-2.0 OR BSD-3-Clause" license SPDX expression
+    monkeypatch.setattr(sys, "exit", lambda n: None)
+    spdx_args_failure = [
+        f"--fail-on={expression}",
+        "--packages=cryptography",
+    ]
+    args = create_parser().parse_args(spdx_args_failure)
+    create_licenses_table(args)
+
+    captured = capsys.readouterr()
+    if license_expression is None:
+        assert captured.err == ""
+    else:
         assert "fail-on license" in captured.err
 
 
-def test_spdx_parser_raises_warning_for_operator_and() -> None:
-    with pytest.warns(PipLicensesWarning):
-        _get_spdx_parser()("Apache-2.0 AND BSD-3-Clause")
+@pytest.mark.parametrize(
+    "expression",
+    [
+        "GPL-2.0-or-later WITH Bison-exception-2.2",
+        "Apache-2.0 AND BSD-3-Clause",
+        "Apache-2.0 OR BSD-3-Clause",
+        "Hello World",
+    ],
+    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX"],
+)
+@pytest.mark.skipif(
+    license_expression is not None,
+    reason="Does not work with license-expression package.",
+)
+def test_spdx_parser(expression: str) -> None:
+    assert _get_spdx_parser()(expression) == {expression}
 
 
-def test_spdx_parser_raises_warning_for_operator_with() -> None:
-    with pytest.warns(PipLicensesWarning):
-        _get_spdx_parser()("GPL-2.0-or-later WITH Bison-exception-2.2")
+@pytest.mark.parametrize(
+    "expression,expected,should_warn",
+    [
+        (
+            "GPL-2.0-or-later WITH Bison-exception-2.2",
+            {"GPL-2.0-or-later WITH Bison-exception-2.2"},
+            True,
+        ),
+        ("Apache-2.0 AND BSD-3-Clause", {"Apache-2.0 AND BSD-3-Clause"}, True),
+        ("Apache-2.0 OR BSD-3-Clause", {"Apache-2.0", "BSD-3-Clause"}, False),
+        ("Hello World", {"Hello World"}, False),
+    ],
+    ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX"],
+)
+@pytest.mark.skipif(
+    license_expression is None, reason="Requires license-expression package."
+)
+def test_spdx_parser__license_expression(
+    expression: str, expected: set[str], should_warn: bool
+) -> None:
+    if should_warn:
+        with pytest.warns(PipLicensesWarning):
+            assert _get_spdx_parser()(expression) == expected
+    else:
+        assert _get_spdx_parser()(expression) == expected
 
 
 def test_fail_on_partial_match(monkeypatch, capsys) -> None:

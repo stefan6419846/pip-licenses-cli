@@ -44,7 +44,7 @@ lint:
 
 .PHONY: test
 test:
-	$(VENV_NAME)/bin/python -m pytest
+	$(VENV_NAME)/bin/python -m pytest -vv
 
 .PHONY: deploy
 deploy: build

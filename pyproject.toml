@@ -33,7 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 spdx = [
-    "license-expression >= 30.4.1",
+    "license-expression",
 ]
 dev = [
     "pip-licenses-cli[spdx]",

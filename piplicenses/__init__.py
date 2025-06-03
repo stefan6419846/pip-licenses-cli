@@ -51,7 +51,7 @@ from prettytable import HRuleStyle, PrettyTable
 
 if sys.version_info >= (3, 11):
     import tomllib
-else:
+else:  # pragma: no cover
     import tomli as tomllib
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -124,7 +124,7 @@ SYSTEM_PACKAGES = [
     "setuptools",
     "wheel",
 ]
-if sys.version_info < (3, 11):
+if sys.version_info < (3, 11):  # pragma: no cover
     SYSTEM_PACKAGES.append("tomli")
 
 
@@ -135,7 +135,8 @@ class PipLicensesWarning(UserWarning):
 
 
 class SpdxParser(Protocol):
-    def __call__(self, expression: str) -> set[str]: ...
+    def __call__(self, expression: str) -> set[str]:  # pragma: no cover
+        pass
 
 
 @functools.lru_cache(maxsize=1)
@@ -144,7 +145,7 @@ def _get_spdx_parser() -> SpdxParser:
     Create an SPDX expression parser.
 
     If the extra "spdx" is not installed, then the parser just returns a set
-    with the provided expression as only element.
+    with the provided expression as the only element.
     """
     try:
         from license_expression import get_spdx_licensing
@@ -164,7 +165,7 @@ def _get_spdx_parser() -> SpdxParser:
     def parser(expression: str) -> set[str]:
         try:
             result = licensing.validate(expression)
-        except Exception as exception:
+        except Exception:
             # https://github.com/aboutcode-org/license-expression/issues/97
             return {expression}
         if result.errors:
@@ -173,7 +174,8 @@ def _get_spdx_parser() -> SpdxParser:
         if parsed is None:
             return {expression}
         parsed = parsed.simplify()
-        if re.search("AND|WITH", str(parsed)):
+        parsed_str = str(parsed)
+        if "AND" in parsed_str or "WITH" in parsed_str:
             warnings.warn(
                 "SPDX expressions with 'AND' or 'WITH' are currently not "
                 f"supported. The expression {parsed} is treated as the "
@@ -182,7 +184,7 @@ def _get_spdx_parser() -> SpdxParser:
                 stacklevel=2,
             )
             return {expression}
-        return {license for license in parsed.objects}
+        return {license_name for license_name in parsed.objects}
 
     return parser
 
