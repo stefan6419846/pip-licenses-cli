@@ -902,7 +902,7 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     )
 
 
-def test_spdx_operator_OR_succeeds_if_either_license_is_allowed(
+def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
     capsys: CaptureFixture,
 ) -> None:
     # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
@@ -919,7 +919,7 @@ def test_spdx_operator_OR_succeeds_if_either_license_is_allowed(
         assert "" == captured.err
 
 
-def test_spdx_operator_OR_fails_if_either_license_is_not_allowed(
+def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
     monkeypatch: MonkeyPatch, capsys: CaptureFixture
 ) -> None:
     # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
@@ -937,12 +937,12 @@ def test_spdx_operator_OR_fails_if_either_license_is_not_allowed(
         assert "fail-on license" in captured.err
 
 
-def test_spdx_parser_raises_warning_for_operator_AND() -> None:
+def test_spdx_parser_raises_warning_for_operator_and() -> None:
     with pytest.warns(PipLicensesWarning):
         _get_spdx_parser()("Apache-2.0 AND BSD-3-Clause")
 
 
-def test_spdx_parser_raises_warning_for_operator_WITH() -> None:
+def test_spdx_parser_raises_warning_for_operator_with() -> None:
     with pytest.warns(PipLicensesWarning):
         _get_spdx_parser()("GPL-2.0-or-later WITH Bison-exception-2.2")
 
