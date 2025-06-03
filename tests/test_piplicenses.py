@@ -119,6 +119,7 @@ class CommandLineTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        super().setUpClass()
         cls.parser = create_parser()
 
 
@@ -625,7 +626,7 @@ class TestGetLicenses(CommandLineTestCase):
         self.assertNotIn("Name", output_string)
 
         warn_string = create_warn_string(args)
-        self.assertTrue(len(warn_string) == 0)
+        self.assertEqual("", warn_string)
 
     def test_summary_sort_by_count(self) -> None:
         summary_args = ["--summary", "--order=count"]
@@ -715,8 +716,8 @@ class TestGetLicenses(CommandLineTestCase):
         b_diff_c = case_insensitive_set_diff(set_b, set_c)
         a_diff_empty = case_insensitive_set_diff(set_a, set())
 
-        self.assertTrue(len(a_diff_b) == 0)
-        self.assertTrue(len(a_diff_c) == 0)
+        self.assertSetEqual(set(), a_diff_b)
+        self.assertSetEqual(set(), a_diff_c)
         self.assertIn("BSD License", b_diff_c)
         self.assertIn("MIT License", a_diff_empty)
 
@@ -729,10 +730,10 @@ class TestGetLicenses(CommandLineTestCase):
         b_intersect_c = case_insensitive_set_intersect(set_b, set_c)
         a_intersect_empty = case_insensitive_set_intersect(set_a, set())
 
-        self.assertTrue(set_a == a_intersect_b)
-        self.assertTrue(set_a == a_intersect_c)
-        self.assertTrue({"revised BSD"} == b_intersect_c)
-        self.assertTrue(len(a_intersect_empty) == 0)
+        self.assertSetEqual(set_a, a_intersect_b)
+        self.assertSetEqual(set_a, a_intersect_c)
+        self.assertSetEqual({"revised BSD"}, b_intersect_c)
+        self.assertSetEqual(set(), a_intersect_empty)
 
     def test_case_insensitive_partial_match_set_diff(self) -> None:
         set_a = {"MIT License"}
@@ -743,8 +744,8 @@ class TestGetLicenses(CommandLineTestCase):
         b_diff_c = case_insensitive_partial_match_set_diff(set_b, set_c)
         a_diff_empty = case_insensitive_partial_match_set_diff(set_a, set())
 
-        self.assertTrue(len(a_diff_b) == 0)
-        self.assertTrue(len(a_diff_c) == 0)
+        self.assertSetEqual(set(), a_diff_b)
+        self.assertSetEqual(set(), a_diff_c)
         self.assertIn("BSD License", b_diff_c)
         self.assertIn("MIT License", a_diff_empty)
 
@@ -765,10 +766,10 @@ class TestGetLicenses(CommandLineTestCase):
             set_a, set()
         )
 
-        self.assertTrue(set_a == a_intersect_b)
-        self.assertTrue(set_a == a_intersect_c)
-        self.assertTrue({"revised BSD"} == b_intersect_c)
-        self.assertTrue(len(a_intersect_empty) == 0)
+        self.assertSetEqual(set_a, a_intersect_b)
+        self.assertSetEqual(set_a, a_intersect_c)
+        self.assertSetEqual({"revised BSD"}, b_intersect_c)
+        self.assertSetEqual(set(), a_intersect_empty)
 
 
 def test_output_file_success(monkeypatch, capsys) -> None:
@@ -1055,27 +1056,27 @@ def test_verify_args(
     parser: CompatibleArgumentParser, capsys: CaptureFixture
 ) -> None:
     # --with-license-file missing
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--no-license-path"])
     capture = capsys.readouterr().err
     for arg in ("--no-license-path", "--with-license-file"):
         assert arg in capture
 
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--with-notice-file"])
     capture = capsys.readouterr().err
     for arg in ("--with-notice-file", "--with-license-file"):
         assert arg in capture
 
     # --filter-strings missing
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--filter-code-page=utf8"])
     capture = capsys.readouterr().err
     for arg in ("--filter-code-page", "--filter-strings"):
         assert arg in capture
 
     # invalid code-page
-    with pytest.raises(SystemExit) as ex:
+    with pytest.raises(SystemExit):
         parser.parse_args(["--filter-strings", "--filter-code-page=XX"])
     capture = capsys.readouterr().err
     for arg in ("invalid code", "--filter-code-page"):

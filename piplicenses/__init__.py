@@ -28,7 +28,6 @@ from __future__ import annotations
 import argparse
 import codecs
 import functools
-import re
 import sys
 import warnings
 from collections import Counter
@@ -462,12 +461,12 @@ class CSVPrettyTable(PrettyTable):
 
         lines: list[str] = []
         formatted_header = ",".join(
-            ['"%s"' % (esc_quotes(val),) for val in self._field_names]
+            [f'"{esc_quotes(val)}"' for val in self._field_names]
         )
         lines.append(formatted_header)
         lines.extend(
             [
-                ",".join(['"%s"' % (esc_quotes(val),) for val in row])
+                ",".join([f'"{esc_quotes(val)}"' for val in row])
                 for row in formatted_rows
             ]
         )
@@ -501,12 +500,12 @@ def factory_styled_table_with_args(
     table = PrettyTable()
     table.field_names = output_fields  # type: ignore[assignment]
     table.align = "l"  # type: ignore[assignment]
-    table.border = args.format_ in (
+    table.border = args.format_ in {
         FormatArg.MARKDOWN,
         FormatArg.RST,
         FormatArg.CONFLUENCE,
         FormatArg.JSON,
-    )
+    }
     table.header = True
 
     if args.format_ == FormatArg.MARKDOWN:
@@ -727,10 +726,10 @@ class CompatibleArgumentParser(argparse.ArgumentParser):
             codecs.lookup(args.filter_code_page)
         except LookupError:
             self.error(
-                "invalid code page '%s' given for '--filter-code-page, "
-                "check https://docs.python.org/3/library/codecs.html"
-                "#standard-encodings for valid code pages"
-                % args.filter_code_page
+                f"invalid code page {args.filter_code_page!r} given "
+                "for '--filter-code-page, check "
+                "https://docs.python.org/3/library/codecs.html#standard-encodings "  # noqa: E501
+                "for valid code pages"
             )
 
 
@@ -1016,9 +1015,9 @@ def output_colored(code: str, text: str, is_bold: bool = False) -> str:
     Create function to output with color sequence
     """
     if is_bold:
-        code = "1;%s" % code
+        code = f"1;{code}"
 
-    return "\033[%sm%s\033[0m" % (code, text)
+    return f"\033[{code}m{text}\033[0m"
 
 
 def save_if_needs(output_file: None | str, output_string: str) -> None:
