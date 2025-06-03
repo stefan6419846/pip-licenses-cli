@@ -20,8 +20,8 @@ import docutils.utils
 import piplicenses_lib
 import pytest
 import tomli_w
-from _pytest.capture import CaptureFixture
 from prettytable import HRuleStyle
+from pytest import CaptureFixture, MonkeyPatch
 
 import piplicenses
 from piplicenses import (
@@ -29,7 +29,9 @@ from piplicenses import (
     SYSTEM_PACKAGES,
     CompatibleArgumentParser,
     FromArg,
+    PipLicensesWarning,
     __pkgname__,
+    _get_spdx_parser,
     case_insensitive_partial_match_set_diff,
     case_insensitive_partial_match_set_intersect,
     case_insensitive_set_diff,
@@ -188,6 +190,18 @@ class TestGetLicenses(CommandLineTestCase):
         license_notation_as_meta = "MIT"
         self.assertIn(license_notation_as_meta, license_columns)
 
+    def test_with_spdx_license_in_meta(self) -> None:
+        from_args = ["--from=meta"]
+        args = self.parser.parse_args(from_args)
+        output_fields = get_output_fields(args)
+        table = create_licenses_table(args, output_fields)
+
+        self.assertIn("License", output_fields)
+
+        license_columns = self._create_license_columns(table, output_fields)
+        license_notation_as_classifier = "Apache-2.0 OR BSD-3-Clause"
+        self.assertIn(license_notation_as_classifier, license_columns)
+
     def test_from_classifier(self) -> None:
         from_args = ["--from=classifier"]
         args = self.parser.parse_args(from_args)
@@ -247,10 +261,13 @@ class TestGetLicenses(CommandLineTestCase):
         table = create_licenses_table(args)
 
         pkg_name_columns = self._create_pkg_name_columns(table)
+        pkg_names = list(
+            map(piplicenses_lib.normalize_package_name, pkg_name_columns)
+        )
         external_sys_pkgs = list(SYSTEM_PACKAGES)
         external_sys_pkgs.remove(__pkgname__)
         for sys_pkg in external_sys_pkgs:
-            self.assertIn(sys_pkg, pkg_name_columns)
+            self.assertIn(sys_pkg, pkg_names)
 
     def test_with_authors(self) -> None:
         with_authors_args = ["--with-authors"]
@@ -871,7 +888,7 @@ def test_different_python() -> None:
     assert package_names == expected_packages
 
 
-def test_fail_on(monkeypatch, capsys) -> None:
+def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     licenses = ("MIT license",)
     allow_only_args = ["--fail-on={}".format(";".join(licenses))]
     monkeypatch.setattr(sys, "exit", lambda n: None)
@@ -883,6 +900,51 @@ def test_fail_on(monkeypatch, capsys) -> None:
     assert (
         "fail-on license MIT License was found for " "package" in captured.err
     )
+
+
+def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
+    capsys: CaptureFixture,
+) -> None:
+    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
+    licenses = ("Apache-2.0", "BSD-3-Clause")
+    for license in licenses:
+        spdx_args_success = [
+            "--allow-only={}".format(license),
+            "--packages=cryptography",
+        ]
+        args = create_parser().parse_args(spdx_args_success)
+        create_licenses_table(args)
+
+        captured = capsys.readouterr()
+        assert "" == captured.err
+
+
+def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
+    monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    # cryptography has a "Apache-2.0 OR BSD-3-Clause" license SPDX expression
+    licenses = ("Apache-2.0", "BSD-3-Clause")
+    monkeypatch.setattr(sys, "exit", lambda n: None)
+    for license in licenses:
+        spdx_args_failure = [
+            "--fail-on={}".format(license),
+            "--packages=cryptography",
+        ]
+        args = create_parser().parse_args(spdx_args_failure)
+        create_licenses_table(args)
+
+        captured = capsys.readouterr()
+        assert "fail-on license" in captured.err
+
+
+def test_spdx_parser_raises_warning_for_operator_and() -> None:
+    with pytest.warns(PipLicensesWarning):
+        _get_spdx_parser()("Apache-2.0 AND BSD-3-Clause")
+
+
+def test_spdx_parser_raises_warning_for_operator_with() -> None:
+    with pytest.warns(PipLicensesWarning):
+        _get_spdx_parser()("GPL-2.0-or-later WITH Bison-exception-2.2")
 
 
 def test_fail_on_partial_match(monkeypatch, capsys) -> None:

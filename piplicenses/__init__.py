@@ -27,13 +27,16 @@ from __future__ import annotations
 
 import argparse
 import codecs
+import functools
+import re
 import sys
+import warnings
 from collections import Counter
 from dataclasses import asdict
 from enum import Enum, auto
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Type, cast
+from typing import TYPE_CHECKING, Protocol, Type, cast
 
 from piplicenses_lib import (
     LICENSE_UNKNOWN,
@@ -112,16 +115,76 @@ FIELDS_TO_METADATA_KEYS = {
 }
 
 
-SYSTEM_PACKAGES = (
+SYSTEM_PACKAGES = [
     __pkgname__,
     "pip",
     "pip-licenses-lib",
     "prettytable",
     "wcwidth",
     "setuptools",
-    "tomli",
     "wheel",
-)
+]
+if sys.version_info < (3, 11):
+    SYSTEM_PACKAGES.append("tomli")
+
+
+class PipLicensesWarning(UserWarning):
+    """
+    Base class for warnings emitted by the pip-licenses-cli package.
+    """
+
+
+class SpdxParser(Protocol):
+    def __call__(self, expression: str) -> set[str]: ...
+
+
+@functools.lru_cache(maxsize=1)
+def _get_spdx_parser() -> SpdxParser:
+    """
+    Create an SPDX expression parser.
+
+    If the extra "spdx" is not installed, then the parser just returns a set
+    with the provided expression as only element.
+    """
+    try:
+        from license_expression import get_spdx_licensing
+
+    except ImportError:
+
+        def dummy_parser(expression: str) -> set[str]:
+            return {expression}
+
+        return dummy_parser
+
+    SYSTEM_PACKAGES.append("license-expression")
+    SYSTEM_PACKAGES.append("boolean-py")
+
+    licensing = get_spdx_licensing()
+
+    def parser(expression: str) -> set[str]:
+        try:
+            result = licensing.validate(expression)
+        except Exception as exception:
+            # https://github.com/aboutcode-org/license-expression/issues/97
+            return {expression}
+        if result.errors:
+            return {expression}
+        parsed = licensing.parse(expression)
+        if parsed is None:
+            return {expression}
+        parsed = parsed.simplify()
+        if re.search("AND|WITH", str(parsed)):
+            warnings.warn(
+                "SPDX expressions with 'AND' or 'WITH' are currently not "
+                f"supported. The expression {parsed} is treated as the "
+                f"literal '{expression}'.",
+                category=PipLicensesWarning,
+                stacklevel=2,
+            )
+            return {expression}
+        return {license for license in parsed.objects}
+
+    return parser
 
 
 def get_packages(
@@ -184,14 +247,18 @@ def get_packages(
 
                 setattr(pkg_info, key, _handle(value))
 
+        parsed_license_names: set[str] = set()
+        for license_expr in pkg_info.license_names:
+            parsed_license_names |= _parse_spdx(license_expr)
+
         if fail_on_licenses:
             if not args.partial_match:
                 failed_licenses = case_insensitive_set_intersect(
-                    pkg_info.license_names, fail_on_licenses
+                    parsed_license_names, fail_on_licenses
                 )
             else:
                 failed_licenses = case_insensitive_partial_match_set_intersect(
-                    pkg_info.license_names, fail_on_licenses
+                    parsed_license_names, fail_on_licenses
                 )
             if failed_licenses:
                 sys.stderr.write(
@@ -207,14 +274,14 @@ def get_packages(
         if allow_only_licenses:
             if not args.partial_match:
                 uncommon_licenses = case_insensitive_set_diff(
-                    pkg_info.license_names, allow_only_licenses
+                    parsed_license_names, allow_only_licenses
                 )
             else:
                 uncommon_licenses = case_insensitive_partial_match_set_diff(
-                    pkg_info.license_names, allow_only_licenses
+                    parsed_license_names, allow_only_licenses
                 )
 
-            if len(uncommon_licenses) == len(pkg_info.license_names):
+            if len(uncommon_licenses) == len(parsed_license_names):
                 sys.stderr.write(
                     "license {} not in allow-only licenses was found"
                     " for package {}:{}\n".format(
@@ -226,6 +293,13 @@ def get_packages(
                 sys.exit(1)
 
         yield pkg_info
+
+
+def _parse_spdx(
+    expression: str,
+) -> set[str]:
+    """Parse a license expression and return a set of licenses."""
+    return _get_spdx_parser()(expression)
 
 
 def create_licenses_table(

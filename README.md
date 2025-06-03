@@ -21,6 +21,12 @@ You can install this package from PyPI:
 python -m pip install pip-licenses-cli
 ```
 
+If you want to additionally parse license declarations with [SPDX expressions](https://peps.python.org/pep-0639/#spdx-license-expression-syntax), then also install the `spdx` extra:
+
+```bash
+python -m pip install 'pip-licenses-cli[spdx]'
+```
+
 Alternatively, you can use the package from source directly after installing the required dependencies.
 
 ## Usage
