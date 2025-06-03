@@ -49,7 +49,7 @@ from piplicenses_lib import (
 )
 from prettytable import HRuleStyle, PrettyTable
 
-if sys.version_info >= (3, 11):
+if sys.version_info >= (3, 11):  # pragma: no cover
     import tomllib
 else:  # pragma: no cover
     import tomli as tomllib
