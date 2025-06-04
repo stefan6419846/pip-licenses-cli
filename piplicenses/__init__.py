@@ -574,7 +574,7 @@ def create_warn_string(args: CustomNamespace) -> str:
     warn = partial(output_colored, "33")
 
     if args.with_license_file and not args.format_ == FormatArg.JSON:
-        message = warn(("Due to the length of these fields, this option is " "best paired with --format=json."))
+        message = warn("Due to the length of these fields, this option is " "best paired with --format=json.")
         warn_messages.append(message)
 
     if args.summary and (args.with_authors or args.with_urls):

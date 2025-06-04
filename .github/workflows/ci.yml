@@ -36,7 +36,7 @@ jobs:
           mypy .
       - name: Test with pytest (SPDX support)
         run:
-          pytest --pycodestyle -v --cov
+          pytest -v --cov
       - name: Test with pytest (Default)
         run: |
           python -m pip uninstall license-expression -y
