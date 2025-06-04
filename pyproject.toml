@@ -41,19 +41,21 @@ dev = [
     "black",
     "cryptography >= 45.0.3",
     "docutils",
+    "flake8",
+    "flake8-bugbear",
     "isort",
-    "wheel",
     "mypy",
+    "pep8-naming",
     "pip-tools",
     "pypandoc",
     "pytest-cov",
-    "pytest-pycodestyle",
     "twine",
     "tomli-w",
     "types-colorama",
     "types-docutils",
     "types-pexpect",
     "types-pygments",
+    "wheel",
 ]
 
 [project.urls]
@@ -75,13 +77,13 @@ namespaces = false
 version = {attr = "piplicenses.__version__"}
 
 [tool.pytest.ini_options]
-addopts = "--pycodestyle -v --cov --cov-report term-missing"
+addopts = "-vv --cov --cov-report term-missing"
 
 [tool.black]
-line-length = 79
+line-length = 160
 
 [tool.isort]
-line_length = 72
+line_length = 160
 known_first_party = ["piplicenses"]
 profile = "black"
 

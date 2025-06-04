@@ -64,9 +64,7 @@ open = open  # allow monkey patching
 
 __pkgname__ = "pip-licenses-cli"
 __version__ = "1.2.0"
-__summary__ = (
-    "Dump the software license list of Python packages installed with pip."
-)
+__summary__ = "Dump the software license list of Python packages installed with pip."
 
 
 FIELD_NAMES = (
@@ -176,9 +174,7 @@ def _get_spdx_parser() -> SpdxParser:
         parsed_str = str(parsed)
         if "AND" in parsed_str or "WITH" in parsed_str:
             warnings.warn(
-                "SPDX expressions with 'AND' or 'WITH' are currently not "
-                f"supported. The expression {parsed} is treated as the "
-                f"literal '{expression}'.",
+                f"SPDX expressions with 'AND' or 'WITH' are currently not supported. The expression {parsed} is treated as the literal {expression!r}.",
                 category=PipLicensesWarning,
                 stacklevel=2,
             )
@@ -191,9 +187,7 @@ def _get_spdx_parser() -> SpdxParser:
 def get_packages(
     args: CustomNamespace,
 ) -> Iterator[PackageInfo]:
-    ignore_pkgs_as_normalize = [
-        normalize_package_name(pkg) for pkg in args.ignore_packages
-    ]
+    ignore_pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.ignore_packages]
     pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.packages]
 
     fail_on_licenses = set()
@@ -214,10 +208,7 @@ def get_packages(
         pkg_name = normalize_package_name(pkg_info.name)
         pkg_name_and_version = pkg_name + ":" + pkg_info.version
 
-        if (
-            pkg_name.lower() in ignore_pkgs_as_normalize
-            or pkg_name_and_version.lower() in ignore_pkgs_as_normalize
-        ):
+        if pkg_name.lower() in ignore_pkgs_as_normalize or pkg_name_and_version.lower() in ignore_pkgs_as_normalize:
             continue
 
         if pkgs_as_normalize and pkg_name.lower() not in pkgs_as_normalize:
@@ -229,9 +220,7 @@ def get_packages(
         if args.filter_strings:
 
             def filter_string(item: str) -> str:
-                return item.encode(
-                    args.filter_code_page, errors="ignore"
-                ).decode(args.filter_code_page)
+                return item.encode(args.filter_code_page, errors="ignore").decode(args.filter_code_page)
 
             for key, value in asdict(pkg_info).items():
                 if key == "distribution":
@@ -254,17 +243,12 @@ def get_packages(
 
         if fail_on_licenses:
             if not args.partial_match:
-                failed_licenses = case_insensitive_set_intersect(
-                    parsed_license_names, fail_on_licenses
-                )
+                failed_licenses = case_insensitive_set_intersect(parsed_license_names, fail_on_licenses)
             else:
-                failed_licenses = case_insensitive_partial_match_set_intersect(
-                    parsed_license_names, fail_on_licenses
-                )
+                failed_licenses = case_insensitive_partial_match_set_intersect(parsed_license_names, fail_on_licenses)
             if failed_licenses:
                 sys.stderr.write(
-                    "fail-on license {} was found for package "
-                    "{}:{}\n".format(
+                    "fail-on license {} was found for package {}:{}\n".format(
                         "; ".join(sorted(failed_licenses)),
                         pkg_info.name,
                         pkg_info.version,
@@ -274,18 +258,13 @@ def get_packages(
 
         if allow_only_licenses:
             if not args.partial_match:
-                uncommon_licenses = case_insensitive_set_diff(
-                    parsed_license_names, allow_only_licenses
-                )
+                uncommon_licenses = case_insensitive_set_diff(parsed_license_names, allow_only_licenses)
             else:
-                uncommon_licenses = case_insensitive_partial_match_set_diff(
-                    parsed_license_names, allow_only_licenses
-                )
+                uncommon_licenses = case_insensitive_partial_match_set_diff(parsed_license_names, allow_only_licenses)
 
             if len(uncommon_licenses) == len(parsed_license_names):
                 sys.stderr.write(
-                    "license {} not in allow-only licenses was found"
-                    " for package {}:{}\n".format(
+                    "license {} not in allow-only licenses was found for package {}:{}\n".format(
                         "; ".join(sorted(uncommon_licenses)),
                         pkg_info.name,
                         pkg_info.version,
@@ -317,10 +296,7 @@ def create_licenses_table(
                 license_str = "; ".join(sorted(license_set))
                 row.append(license_str)
             elif field == "License-Classifier":
-                row.append(
-                    "; ".join(sorted(pkg.license_classifiers))
-                    or LICENSE_UNKNOWN
-                )
+                row.append("; ".join(sorted(pkg.license_classifiers)) or LICENSE_UNKNOWN)
             elif hasattr(pkg, field.lower()):
                 row.append(cast(str, getattr(pkg, field.lower())))
             else:
@@ -340,9 +316,7 @@ def create_licenses_table(
 
 
 def create_summary_table(args: CustomNamespace) -> PrettyTable:
-    counts = Counter(
-        "; ".join(sorted(pkg.license_names)) for pkg in get_packages(args)
-    )
+    counts = Counter("; ".join(sorted(pkg.license_names)) for pkg in get_packages(args))
 
     table = factory_styled_table_with_args(args, SUMMARY_FIELD_NAMES)
     for license, count in counts.items():
@@ -451,25 +425,16 @@ class CSVPrettyTable(PrettyTable):
             except UnicodeDecodeError:  # pragma: no cover
                 return cast(bytes, val).decode("utf-8").replace('"', '""')
             except UnicodeEncodeError:  # pragma: no cover
-                return str(
-                    cast(str, val).encode("unicode_escape").replace('"', '""')  # type: ignore[arg-type] # noqa: E501
-                )
+                return str(cast(str, val).encode("unicode_escape").replace('"', '""'))  # type: ignore[arg-type]
 
         options = self._get_options(kwargs)
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows)
 
         lines: list[str] = []
-        formatted_header = ",".join(
-            [f'"{esc_quotes(val)}"' for val in self._field_names]
-        )
+        formatted_header = ",".join([f'"{esc_quotes(val)}"' for val in self._field_names])
         lines.append(formatted_header)
-        lines.extend(
-            [
-                ",".join([f'"{esc_quotes(val)}"' for val in row])
-                for row in formatted_rows
-            ]
-        )
+        lines.extend([",".join([f'"{esc_quotes(val)}"' for val in row]) for row in formatted_rows])
         return "\n".join(lines)
 
 
@@ -609,21 +574,14 @@ def create_warn_string(args: CustomNamespace) -> str:
     warn = partial(output_colored, "33")
 
     if args.with_license_file and not args.format_ == FormatArg.JSON:
-        message = warn(
-            (
-                "Due to the length of these fields, this option is "
-                "best paired with --format=json."
-            )
-        )
+        message = warn("Due to the length of these fields, this option is " "best paired with --format=json.")
         warn_messages.append(message)
 
     if args.summary and (args.with_authors or args.with_urls):
         message = warn(
             (
-                "When using this option, only --order=count or "
-                "--order=license has an effect for the --order "
-                "option. And using --with-authors and --with-urls "
-                "will be ignored."
+                "When using this option, only --order=count or --order=license has an effect for the --order "
+                "option. And using --with-authors and --with-urls will be ignored."
             )
         )
         warn_messages.append(message)
@@ -662,9 +620,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):  # pragma: no cover
     def _expand_help(self, action: argparse.Action) -> str:
         if isinstance(action.default, Enum):
             default_value = enum_key_to_value(action.default)
-            return cast(str, self._get_help_string(action)) % {
-                "default": default_value
-            }
+            return cast(str, self._get_help_string(action)) % {"default": default_value}
         return super()._expand_help(action)
 
     def _split_lines(self, text: str, width: int) -> list[str]:
@@ -710,26 +666,16 @@ class CompatibleArgumentParser(argparse.ArgumentParser):
         return args_
 
     def _verify_args(self, args: CustomNamespace) -> None:
-        if args.with_license_file is False and (
-            args.no_license_path is True or args.with_notice_file is True
-        ):
-            self.error(
-                "'--no-license-path' and '--with-notice-file' require "
-                "the '--with-license-file' option to be set"
-            )
+        if args.with_license_file is False and (args.no_license_path is True or args.with_notice_file is True):
+            self.error("'--no-license-path' and '--with-notice-file' require " "the '--with-license-file' option to be set")
         if args.filter_strings is False and args.filter_code_page != "latin1":
-            self.error(
-                "'--filter-code-page' requires the '--filter-strings' "
-                "option to be set"
-            )
+            self.error("'--filter-code-page' requires the '--filter-strings' " "option to be set")
         try:
             codecs.lookup(args.filter_code_page)
         except LookupError:
             self.error(
-                f"invalid code page {args.filter_code_page!r} given "
-                "for '--filter-code-page, check "
-                "https://docs.python.org/3/library/codecs.html#standard-encodings "  # noqa: E501
-                "for valid code pages"
+                f"invalid code page {args.filter_code_page!r} given for '--filter-code-page, check "
+                "https://docs.python.org/3/library/codecs.html#standard-encodings for valid code pages"
             )
 
 
@@ -763,14 +709,10 @@ def enum_key_to_value(enum_key: Enum) -> str:
 
 
 def choices_from_enum(enum_cls: Type[NoValueEnum]) -> list[str]:
-    return [
-        key.replace("_", "-").lower() for key in enum_cls.__members__.keys()
-    ]
+    return [key.replace("_", "-").lower() for key in enum_cls.__members__.keys()]
 
 
-def get_value_from_enum(
-    enum_cls: Type[NoValueEnum], value: str
-) -> NoValueEnum:
+def get_value_from_enum(enum_cls: Type[NoValueEnum], value: str) -> NoValueEnum:
     return getattr(enum_cls, value_to_enum_key(value))
 
 
@@ -803,9 +745,7 @@ def load_config_from_file(pyproject_path: str):
 def create_parser(
     pyproject_path: str = "pyproject.toml",
 ) -> CompatibleArgumentParser:
-    parser = CompatibleArgumentParser(
-        description=__summary__, formatter_class=CustomHelpFormatter
-    )
+    parser = CompatibleArgumentParser(description=__summary__, formatter_class=CustomHelpFormatter)
 
     config_from_file = load_config_from_file(pyproject_path)
 
@@ -813,19 +753,19 @@ def create_parser(
     format_options = parser.add_argument_group("Format options")
     verify_options = parser.add_argument_group("Verify options")
 
-    parser.add_argument(
-        "-v", "--version", action="version", version="%(prog)s " + __version__
-    )
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s " + __version__)
 
     common_options.add_argument(
         "--python",
         type=str,
         default=config_from_file.get("python", sys.executable),
         metavar="PYTHON_EXEC",
-        help="R| path to python executable to search distributions from\n"
-        "Package will be searched in the selected python's sys.path\n"
-        "By default, will search packages for current env executable\n"
-        "(default: sys.executable)",
+        help=(
+            "R| path to python executable to search distributions from\n"
+            "Package will be searched in the selected python's sys.path\n"
+            "By default, will search packages for current env executable\n"
+            "(default: sys.executable)"
+        ),
     )
 
     common_options.add_argument(
@@ -833,28 +773,20 @@ def create_parser(
         dest="from_",
         action=SelectAction,
         type=str,
-        default=get_value_from_enum(
-            FromArg, config_from_file.get("from", "mixed")
-        ),
+        default=get_value_from_enum(FromArg, config_from_file.get("from", "mixed")),
         metavar="SOURCE",
         choices=choices_from_enum(FromArg),
-        help="R|where to find license information\n"
-        '"meta", "classifier, "mixed", "all"\n'
-        "(default: %(default)s)",
+        help="R|where to find license information\n" '"meta", "classifier, "mixed", "all"\n' "(default: %(default)s)",
     )
     common_options.add_argument(
         "-o",
         "--order",
         action=SelectAction,
         type=str,
-        default=get_value_from_enum(
-            OrderArg, config_from_file.get("order", "name")
-        ),
+        default=get_value_from_enum(OrderArg, config_from_file.get("order", "name")),
         metavar="COL",
         choices=choices_from_enum(OrderArg),
-        help="R|order by column\n"
-        '"name", "license", "author", "url"\n'
-        "(default: %(default)s)",
+        help="R|order by column\n" '"name", "license", "author", "url"\n' "(default: %(default)s)",
     )
     common_options.add_argument(
         "-f",
@@ -862,16 +794,16 @@ def create_parser(
         dest="format_",
         action=SelectAction,
         type=str,
-        default=get_value_from_enum(
-            FormatArg, config_from_file.get("format", "plain")
-        ),
+        default=get_value_from_enum(FormatArg, config_from_file.get("format", "plain")),
         metavar="STYLE",
         choices=choices_from_enum(FormatArg),
-        help="R|dump as set format style\n"
-        '"plain", "plain-vertical" "markdown", "rst", \n'
-        '"confluence", "html", "json", \n'
-        '"json-license-finder",  "csv"\n'
-        "(default: %(default)s)",
+        help=(
+            "R|dump as set format style\n"
+            '"plain", "plain-vertical" "markdown", "rst", \n'
+            '"confluence", "html", "json", \n'
+            '"json-license-finder",  "csv"\n'
+            "(default: %(default)s)"
+        ),
     )
     common_options.add_argument(
         "--summary",
@@ -952,22 +884,19 @@ def create_parser(
         "--with-license-file",
         action="store_true",
         default=config_from_file.get("with-license-file", False),
-        help="dump with location of license file and "
-        "contents, most useful with JSON output",
+        help="dump with location of license file and " "contents, most useful with JSON output",
     )
     format_options.add_argument(
         "--no-license-path",
         action="store_true",
         default=config_from_file.get("no-license-path", False),
-        help="I|when specified together with option -l, "
-        "suppress location of license file output",
+        help="I|when specified together with option -l, " "suppress location of license file output",
     )
     format_options.add_argument(
         "--with-notice-file",
         action="store_true",
         default=config_from_file.get("with-notice-file", False),
-        help="I|when specified together with option -l, "
-        "dump with location of license file and contents",
+        help="I|when specified together with option -l, " "dump with location of license file and contents",
     )
     format_options.add_argument(
         "--filter-strings",
@@ -989,16 +918,14 @@ def create_parser(
         action="store",
         type=str,
         default=config_from_file.get("fail-on", None),
-        help="fail (exit with code 1) on the first occurrence "
-        "of the licenses of the semicolon-separated list",
+        help="fail (exit with code 1) on the first occurrence " "of the licenses of the semicolon-separated list",
     )
     verify_options.add_argument(
         "--allow-only",
         action="store",
         type=str,
         default=config_from_file.get("allow-only", None),
-        help="fail (exit with code 1) on the first occurrence "
-        "of the licenses not in the semicolon-separated list",
+        help="fail (exit with code 1) on the first occurrence " "of the licenses not in the semicolon-separated list",
     )
     verify_options.add_argument(
         "--partial-match",

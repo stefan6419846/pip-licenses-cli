@@ -67,22 +67,14 @@ TESTS_PATH = Path(__file__).resolve().parent
 FIXTURES_PATH = TESTS_PATH / "fixtures"
 
 # Read from external file considering a terminal that cannot handle "emoji"
-UNICODE_APPENDIX = (
-    FIXTURES_PATH.joinpath("unicode_characters.txt")
-    .read_text(encoding="utf-8")
-    .replace("\n", "")
-)
+UNICODE_APPENDIX = FIXTURES_PATH.joinpath("unicode_characters.txt").read_text(encoding="utf-8").replace("\n", "")
 
 CRYPTOGRAPHY_VERSION = Distribution.from_name("cryptography").version
 
-importlib_metadata_distributions_orig = (
-    piplicenses_lib.importlib_metadata.distributions
-)
+importlib_metadata_distributions_orig = piplicenses_lib.importlib_metadata.distributions
 
 
-def importlib_metadata_distributions_mocked(
-    *args: Any, **kwargs: Any
-) -> list[Distribution]:
+def importlib_metadata_distributions_mocked(*args: Any, **kwargs: Any) -> list[Distribution]:
     class DistributionMocker(Distribution):
         def __init__(self, orig_dist: Distribution) -> None:
             self.__dist = orig_dist
@@ -151,9 +143,7 @@ class TestGetLicenses(CommandLineTestCase):
     @staticmethod
     def check_rst(text: str) -> None:
         parser = docutils.parsers.rst.Parser()
-        settings = docutils.frontend.get_default_settings(
-            docutils.parsers.rst.Parser
-        )
+        settings = docutils.frontend.get_default_settings(docutils.parsers.rst.Parser)
         settings.halt_level = 3
         document = docutils.utils.new_document("<rst-doc>", settings=settings)
         parser.parse(text, document)
@@ -170,9 +160,7 @@ class TestGetLicenses(CommandLineTestCase):
         self.assertEqual(HRuleStyle.FRAME, table.hrules)
 
         output_fields = get_output_fields(args)
-        self.assertEqual(
-            output_fields, list(DEFAULT_OUTPUT_FIELDS) + ["License"]
-        )
+        self.assertEqual(output_fields, list(DEFAULT_OUTPUT_FIELDS) + ["License"])
         self.assertNotIn("Author", output_fields)
         self.assertNotIn("URL", output_fields)
 
@@ -269,9 +257,7 @@ class TestGetLicenses(CommandLineTestCase):
         table = create_licenses_table(args)
 
         pkg_name_columns = self._create_pkg_name_columns(table)
-        pkg_names = list(
-            map(piplicenses_lib.normalize_package_name, pkg_name_columns)
-        )
+        pkg_names = list(map(piplicenses_lib.normalize_package_name, pkg_name_columns))
         external_sys_pkgs = list(SYSTEM_PACKAGES)
         external_sys_pkgs.remove(__pkgname__)
         for sys_pkg in external_sys_pkgs:
@@ -434,7 +420,7 @@ class TestGetLicenses(CommandLineTestCase):
         self.assertIn(ignore_pkg_name, pkg_name_columns)
 
     def test_with_packages(self) -> None:
-        pkg_name = "py"
+        pkg_name = "pycodestyle"
         only_packages_args = ["--packages=" + pkg_name]
         args = self.parser.parse_args(only_packages_args)
         table = create_licenses_table(args)
@@ -520,9 +506,7 @@ class TestGetLicenses(CommandLineTestCase):
         format_plain_args = ["--format=plain-vertical", "--from=classifier"]
         args = self.parser.parse_args(format_plain_args)
         output_string = create_output_string(args)
-        self.assertIsNotNone(
-            re.search(r"pytest\n\d\.\d\.\d\nMIT License\n", output_string)
-        )
+        self.assertIsNotNone(re.search(r"pytest\n\d\.\d\.\d\nMIT License\n", output_string))
 
     def test_format_markdown(self) -> None:
         format_markdown_args = ["--format=markdown"]
@@ -537,14 +521,10 @@ class TestGetLicenses(CommandLineTestCase):
 
     def _patch_distributions(self) -> None:
         def cleanup():
-            piplicenses_lib.importlib_metadata.distributions = (
-                importlib_metadata_distributions_orig
-            )
+            piplicenses_lib.importlib_metadata.distributions = importlib_metadata_distributions_orig
 
         self.addCleanup(cleanup)
-        piplicenses_lib.importlib_metadata.distributions = (
-            importlib_metadata_distributions_mocked
-        )
+        piplicenses_lib.importlib_metadata.distributions = importlib_metadata_distributions_mocked
 
     def test_format_rst_without_filter(self) -> None:
         self._patch_distributions()
@@ -693,17 +673,13 @@ class TestGetLicenses(CommandLineTestCase):
 
     def test_with_default_filter_and_license_file(self) -> None:
         self._patch_distributions()
-        args = self.parser.parse_args(
-            ["--filter-strings", "--with-license-file"]
-        )
+        args = self.parser.parse_args(["--filter-strings", "--with-license-file"])
         packages = list(piplicenses.get_packages(args))
         self.assertNotIn(UNICODE_APPENDIX, packages[-1].name)
 
     def test_with_specified_filter(self) -> None:
         self._patch_distributions()
-        args = self.parser.parse_args(
-            ["--filter-strings", "--filter-code-page=ascii"]
-        )
+        args = self.parser.parse_args(["--filter-strings", "--filter-code-page=ascii"])
         packages = list(piplicenses.get_packages(args))
         self.assertNotIn(UNICODE_APPENDIX, packages[-1].summary)
 
@@ -753,18 +729,10 @@ class TestGetLicenses(CommandLineTestCase):
         set_a = {"Revised BSD"}
         set_b = {"Apache License", "revised BSD"}
         set_c = {"bsd"}
-        a_intersect_b = case_insensitive_partial_match_set_intersect(
-            set_a, set_b
-        )
-        a_intersect_c = case_insensitive_partial_match_set_intersect(
-            set_a, set_c
-        )
-        b_intersect_c = case_insensitive_partial_match_set_intersect(
-            set_b, set_c
-        )
-        a_intersect_empty = case_insensitive_partial_match_set_intersect(
-            set_a, set()
-        )
+        a_intersect_b = case_insensitive_partial_match_set_intersect(set_a, set_b)
+        a_intersect_c = case_insensitive_partial_match_set_intersect(set_a, set_c)
+        b_intersect_c = case_insensitive_partial_match_set_intersect(set_b, set_c)
+        a_intersect_empty = case_insensitive_partial_match_set_intersect(set_a, set())
 
         self.assertSetEqual(set_a, a_intersect_b)
         self.assertSetEqual(set_a, a_intersect_c)
@@ -841,10 +809,7 @@ def test_allow_only(monkeypatch, capsys) -> None:
 
     captured = capsys.readouterr()
     assert "" == captured.out
-    assert (
-        "license MIT License not in allow-only licenses was found for "
-        "package" in captured.err
-    )
+    assert "license MIT License not in allow-only licenses was found for package" in captured.err
 
 
 def test_allow_only_partial(monkeypatch, capsys) -> None:
@@ -867,10 +832,7 @@ def test_allow_only_partial(monkeypatch, capsys) -> None:
 
     captured = capsys.readouterr()
     assert "" == captured.out
-    assert (
-        "license MIT License not in allow-only licenses was found for "
-        "package" in captured.err
-    )
+    assert "license MIT License not in allow-only licenses was found for package" in captured.err
 
 
 def test_different_python() -> None:
@@ -931,10 +893,7 @@ def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
     if license_expression is not None:
         assert captured.err == ""
     else:
-        assert captured.err == (
-            f"license Apache-2.0 OR BSD-3-Clause not in allow-only licenses"
-            f" was found for package cryptography:{CRYPTOGRAPHY_VERSION}\n"
-        )
+        assert captured.err == f"license Apache-2.0 OR BSD-3-Clause not in allow-only licenses was found for package cryptography:{CRYPTOGRAPHY_VERSION}\n"
 
 
 @pytest.mark.parametrize(
@@ -942,9 +901,7 @@ def test_spdx_operator_or_succeeds_if_either_license_is_allowed(
     ["Apache-2.0", "BSD-3-Clause"],
     ids=["Apache-2.0", "BSD-3-Clause"],
 )
-def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
-    expression: str, monkeypatch: MonkeyPatch, capsys: CaptureFixture
-) -> None:
+def test_spdx_operator_or_fails_if_either_license_is_not_allowed(expression: str, monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     # cryptography has an "Apache-2.0 OR BSD-3-Clause" license SPDX expression
     monkeypatch.setattr(sys, "exit", lambda n: None)
     spdx_args_failure = [
@@ -958,10 +915,7 @@ def test_spdx_operator_or_fails_if_either_license_is_not_allowed(
     if license_expression is None:
         assert captured.err == ""
     else:
-        assert captured.err == (
-            f"fail-on license {expression} was found for package "
-            f"cryptography:{CRYPTOGRAPHY_VERSION}\n"
-        )
+        assert captured.err == f"fail-on license {expression} was found for package cryptography:{CRYPTOGRAPHY_VERSION}\n"
 
 
 @pytest.mark.parametrize(
@@ -998,12 +952,8 @@ def test_spdx_parser(expression: str) -> None:
     ],
     ids=["SPDX WITH", "SPDX AND", "SPDX OR", "Invalid SPDX", "Empty"],
 )
-@pytest.mark.skipif(
-    license_expression is None, reason="Requires license-expression package."
-)
-def test_spdx_parser__license_expression(
-    expression: str, expected: set[str], should_warn: bool
-) -> None:
+@pytest.mark.skipif(license_expression is None, reason="Requires license-expression package.")
+def test_spdx_parser__license_expression(expression: str, expected: set[str], should_warn: bool) -> None:
     if should_warn:
         with pytest.warns(PipLicensesWarning):
             assert _get_spdx_parser()(expression) == expected
@@ -1023,9 +973,7 @@ def test_fail_on_partial_match(monkeypatch, capsys) -> None:
 
     captured = capsys.readouterr()
     assert "" == captured.out
-    assert (
-        "fail-on license MIT License was found for " "package" in captured.err
-    )
+    assert "fail-on license MIT License was found for package" in captured.err
 
 
 def test_enums() -> None:
@@ -1034,16 +982,10 @@ def test_enums() -> None:
         JSON_LICENSE_FINDER = JLF = auto()
 
     assert TestEnum.PLAIN == TestEnum.P
-    assert (
-        getattr(TestEnum, value_to_enum_key("jlf"))
-        == TestEnum.JSON_LICENSE_FINDER
-    )
+    assert getattr(TestEnum, value_to_enum_key("jlf")) == TestEnum.JSON_LICENSE_FINDER
     assert value_to_enum_key("jlf") == "JLF"
     assert value_to_enum_key("json-license-finder") == "JSON_LICENSE_FINDER"
-    assert (
-        enum_key_to_value(TestEnum.JSON_LICENSE_FINDER)
-        == "json-license-finder"
-    )
+    assert enum_key_to_value(TestEnum.JSON_LICENSE_FINDER) == "json-license-finder"
     assert enum_key_to_value(TestEnum.PLAIN) == "plain"
 
 
@@ -1052,9 +994,7 @@ def parser() -> CompatibleArgumentParser:
     return create_parser()
 
 
-def test_verify_args(
-    parser: CompatibleArgumentParser, capsys: CaptureFixture
-) -> None:
+def test_verify_args(parser: CompatibleArgumentParser, capsys: CaptureFixture) -> None:
     # --with-license-file missing
     with pytest.raises(SystemExit):
         parser.parse_args(["--no-license-path"])
@@ -1109,9 +1049,7 @@ def test_pyproject_toml_args_parsed_correctly():
     toml_str = tomli_w.dumps(pyproject_conf)
 
     # Create a temporary file and write the TOML string to it
-    with tempfile.NamedTemporaryFile(
-        suffix=".toml", delete=False
-    ) as temp_file:
+    with tempfile.NamedTemporaryFile(suffix=".toml", delete=False) as temp_file:
         temp_file.write(toml_str.encode("utf-8"))
         temp_file.seek(0)
 
@@ -1142,51 +1080,37 @@ def test_case_insensitive_partial_match_set_diff():
     set_a = {"Python", "Java", "C++"}
     set_b = {"Ruby", "JavaScript"}
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert (
-        result == set_a
-    ), "When no overlap, the result should be the same as set_a."
+    assert result == set_a, "When no overlap, the result should be the same as set_a."
 
     set_a = {"Hello", "World"}
     set_b = {"hello", "world"}
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert (
-        result == set()
-    ), "When all items overlap, the result should be an empty set."
+    assert result == set(), "When all items overlap, the result should be an empty set."
 
     set_a = {"HelloWorld", "Python", "JavaScript"}
     set_b = {"hello", "script"}
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert result == {
-        "Python"
-    }, "Only 'Python' should remain as it has no overlap with set_b."
+    assert result == {"Python"}, "Only 'Python' should remain as it has no overlap with set_b."
 
     set_a = {"HELLO", "world"}
     set_b = {"hello"}
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert result == {
-        "world"
-    }, "The function should handle case-insensitive matches correctly."
+    assert result == {"world"}, "The function should handle case-insensitive matches correctly."
 
     set_a = set()
     set_b = set()
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert (
-        result == set()
-    ), "When both sets are empty, the result should also be empty."
+    assert result == set(), "When both sets are empty, the result should also be empty."
 
     set_a = {"Python", "Java"}
     set_b = set()
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert (
-        result == set_a
-    ), "If set_b is empty, result should be the same as set_a."
+    assert result == set_a, "If set_b is empty, result should be the same as set_a."
 
     set_a = set()
     set_b = {"Ruby"}
     result = case_insensitive_partial_match_set_diff(set_a, set_b)
-    assert (
-        result == set()
-    ), "If set_a is empty, result should be empty regardless of set_b."
+    assert result == set(), "If set_a is empty, result should be empty regardless of set_b."
 
     set_a = {"Python 3.11", "Python 3.12", "Javascript"}
     set_b = {"Python", "Python 3"}

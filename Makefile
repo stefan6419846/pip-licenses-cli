@@ -40,11 +40,12 @@ update-depends:
 lint:
 	$(VENV_NAME)/bin/python -m black .
 	$(VENV_NAME)/bin/python -m isort .
+	$(VENV_NAME)/bin/python -m flake8 .
 	$(VENV_NAME)/bin/python -m mypy .
 
 .PHONY: test
 test:
-	$(VENV_NAME)/bin/python -m pytest -vv
+	$(VENV_NAME)/bin/python -m pytest
 
 .PHONY: deploy
 deploy: build
