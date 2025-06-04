@@ -40,7 +40,7 @@ jobs:
       - name: Test with pytest (Default)
         run: |
           python -m pip uninstall license-expression -y
-          pytest --pycodestyle -v --cov --cov-append
+          pytest -v --cov --cov-append
       - name: Report coverage
         run: |
           python -m coverage report --fail-under=100
