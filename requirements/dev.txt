@@ -182,7 +182,7 @@ wheel==0.45.1
     # via
     #   pip-licenses-cli (pyproject.toml)
     #   pip-tools
-zipp==3.22.0
+zipp==3.23.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
