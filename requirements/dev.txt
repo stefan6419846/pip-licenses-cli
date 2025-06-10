@@ -131,7 +131,7 @@ pytest-cov==6.1.1
     # via pip-licenses-cli (pyproject.toml)
 readme-renderer==44.0
     # via twine
-requests==2.32.3
+requests==2.32.4
     # via
     #   id
     #   requests-toolbelt
