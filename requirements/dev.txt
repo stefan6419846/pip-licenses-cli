@@ -76,7 +76,7 @@ more-itertools==10.7.0
     # via
     #   jaraco-classes
     #   jaraco-functools
-mypy==1.16.0
+mypy==1.16.1
     # via pip-licenses-cli (pyproject.toml)
 mypy-extensions==1.1.0
     # via
