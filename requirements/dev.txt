@@ -106,13 +106,13 @@ pluggy==1.6.0
     # via pytest
 prettytable==3.16.0
     # via pip-licenses-cli (pyproject.toml)
-pycodestyle==2.13.0
+pycodestyle==2.14.0
     # via
     #   autopep8
     #   flake8
 pycparser==2.22
     # via cffi
-pyflakes==3.3.2
+pyflakes==3.4.0
     # via flake8
 pygments==2.19.1
     # via
