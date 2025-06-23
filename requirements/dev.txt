@@ -114,7 +114,7 @@ pycparser==2.22
     # via cffi
 pyflakes==3.3.2
     # via flake8
-pygments==2.19.1
+pygments==2.19.2
     # via
     #   readme-renderer
     #   rich
