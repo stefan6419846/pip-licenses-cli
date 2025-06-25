@@ -64,7 +64,7 @@ jaraco-functools==4.2.1
     # via keyring
 keyring==25.6.0
     # via twine
-license-expression==30.4.1
+license-expression==30.4.2
     # via pip-licenses-cli (pyproject.toml)
 markdown-it-py==3.0.0
     # via rich
