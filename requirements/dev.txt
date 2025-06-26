@@ -96,7 +96,7 @@ pathspec==0.12.1
     #   mypy
 pep8-naming==0.15.1
     # via pip-licenses-cli (pyproject.toml)
-pip-licenses-lib==0.5.0
+pip-licenses-lib==0.6.0
     # via pip-licenses-cli (pyproject.toml)
 pip-tools==7.4.1
     # via pip-licenses-cli (pyproject.toml)
