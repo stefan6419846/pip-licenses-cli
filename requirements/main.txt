@@ -6,7 +6,7 @@
 #
 boolean-py==5.0
     # via license-expression
-license-expression==30.4.2
+license-expression==30.4.3
     # via pip-licenses-cli (pyproject.toml)
 pip-licenses-lib==0.5.0
     # via pip-licenses-cli (pyproject.toml)
