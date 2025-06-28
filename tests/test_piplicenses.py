@@ -54,6 +54,7 @@ from piplicenses import (
     output_colored,
     save_if_needs,
     value_to_enum_key,
+    TOML_SECTION_NAME,
 )
 
 if TYPE_CHECKING:
@@ -1033,7 +1034,7 @@ def test_pyproject_toml_args_parsed_correctly():
     # we test that parameters of different types are deserialized correctly
     pyproject_conf = {
         "tool": {
-            __pkgname__: {
+            TOML_SECTION_NAME: {
                 # choices_from_enum
                 "from": "classifier",
                 # bool
@@ -1056,7 +1057,7 @@ def test_pyproject_toml_args_parsed_correctly():
         parser = create_parser(temp_file.name)
         args = parser.parse_args([])
 
-        tool_conf = pyproject_conf["tool"][__pkgname__]
+        tool_conf = pyproject_conf["tool"][TOML_SECTION_NAME]
 
         # assert values are correctly parsed from toml
         assert args.from_ == FromArg.CLASSIFIER
