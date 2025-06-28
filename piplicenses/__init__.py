@@ -125,6 +125,10 @@ if sys.version_info < (3, 11):  # pragma: no cover
     SYSTEM_PACKAGES.append("tomli")
 
 
+# Not using __pkgname__ because we want to be backwards compatible
+TOML_SECTION_NAME = "pip-licenses"
+
+
 class PipLicensesWarning(UserWarning):
     """
     Base class for warnings emitted by the pip-licenses-cli package.
@@ -738,7 +742,7 @@ class SelectAction(argparse.Action):
 def load_config_from_file(pyproject_path: str):
     if Path(pyproject_path).exists():
         with open(pyproject_path, "rb") as f:
-            return tomllib.load(f).get("tool", {}).get(__pkgname__, {})
+            return tomllib.load(f).get("tool", {}).get(TOML_SECTION_NAME, {})
     return {}
 
 
