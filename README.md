@@ -61,7 +61,7 @@ See useful reports:
 
 `pip-licenses-cli` has been implemented in the policy to minimize the dependencies on external packages.
 
-* [pip-licenses-cli](https://pypi.org/project/pip-licenses-cli/) by the same authors as the CLI (MIT License).
+* [pip-licenses-lib](https://pypi.org/project/pip-licenses-lib/) by the same authors as the CLI (MIT License).
 * [prettytable](https://pypi.org/project/prettytable/) by Luke Maurits, subject to the BSD-3-Clause License.
     * **Note:** This package implicitly requires [wcwidth](https://pypi.org/project/wcwidth/) by Jeff Quast (MIT License).
 * For Python < 3.11: [tomli](https://pypi.org/project/tomli/) by Taneli Hukkinen under the MIT License.
