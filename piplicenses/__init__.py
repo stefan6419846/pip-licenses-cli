@@ -780,7 +780,7 @@ def create_parser(
         default=get_value_from_enum(FromArg, config_from_file.get("from", "mixed")),
         metavar="SOURCE",
         choices=choices_from_enum(FromArg),
-        help="R|where to find license information\n" '"meta", "classifier, "mixed", "all"\n' "(default: %(default)s)",
+        help='R|where to find license information\n"meta", "classifier, "mixed", "all"\n(default: %(default)s)',
     )
     common_options.add_argument(
         "-o",
@@ -790,7 +790,7 @@ def create_parser(
         default=get_value_from_enum(OrderArg, config_from_file.get("order", "name")),
         metavar="COL",
         choices=choices_from_enum(OrderArg),
-        help="R|order by column\n" '"name", "license", "author", "url"\n' "(default: %(default)s)",
+        help='R|order by column\n"name", "license", "author", "url"\n(default: %(default)s)',
     )
     common_options.add_argument(
         "-f",
@@ -888,19 +888,19 @@ def create_parser(
         "--with-license-file",
         action="store_true",
         default=config_from_file.get("with-license-file", False),
-        help="dump with location of license file and " "contents, most useful with JSON output",
+        help="dump with location of license file and contents, most useful with JSON output",
     )
     format_options.add_argument(
         "--no-license-path",
         action="store_true",
         default=config_from_file.get("no-license-path", False),
-        help="I|when specified together with option -l, " "suppress location of license file output",
+        help="I|when specified together with option -l, suppress location of license file output",
     )
     format_options.add_argument(
         "--with-notice-file",
         action="store_true",
         default=config_from_file.get("with-notice-file", False),
-        help="I|when specified together with option -l, " "dump with location of license file and contents",
+        help="I|when specified together with option -l, dump with location of license file and contents",
     )
     format_options.add_argument(
         "--filter-strings",
@@ -914,7 +914,7 @@ def create_parser(
         type=str,
         default=config_from_file.get("filter-code-page", "latin1"),
         metavar="CODE",
-        help="I|specify code page for filtering " "(default: %(default)s)",
+        help="I|specify code page for filtering (default: %(default)s)",
     )
 
     verify_options.add_argument(
@@ -922,14 +922,14 @@ def create_parser(
         action="store",
         type=str,
         default=config_from_file.get("fail-on", None),
-        help="fail (exit with code 1) on the first occurrence " "of the licenses of the semicolon-separated list",
+        help="fail (exit with code 1) on the first occurrence of the licenses of the semicolon-separated list",
     )
     verify_options.add_argument(
         "--allow-only",
         action="store",
         type=str,
         default=config_from_file.get("allow-only", None),
-        help="fail (exit with code 1) on the first occurrence " "of the licenses not in the semicolon-separated list",
+        help="fail (exit with code 1) on the first occurrence of the licenses not in the semicolon-separated list",
     )
     verify_options.add_argument(
         "--partial-match",
