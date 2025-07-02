@@ -1,3 +1,7 @@
+# Version 1.4.0 - 2025-07-02
+
+* Add new flag `--collect-all-failures` to collect all failures before exiting.
+
 # Version 1.3.0 - 2025-06-28
 
 * Make `pyproject.toml` configuration section name backwards-compatible
