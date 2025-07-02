@@ -278,7 +278,7 @@ def get_packages(
             else:
                 sys.stderr.write(fail_message)
                 sys.exit(1)
-        
+
         yield pkg_info
 
     if args.collect_all_failures and failures:
