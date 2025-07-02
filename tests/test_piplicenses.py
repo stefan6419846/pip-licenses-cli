@@ -32,6 +32,7 @@ import piplicenses
 from piplicenses import (
     DEFAULT_OUTPUT_FIELDS,
     SYSTEM_PACKAGES,
+    TOML_SECTION_NAME,
     CompatibleArgumentParser,
     FromArg,
     PipLicensesWarning,
@@ -54,7 +55,6 @@ from piplicenses import (
     output_colored,
     save_if_needs,
     value_to_enum_key,
-    TOML_SECTION_NAME,
 )
 
 if TYPE_CHECKING:
@@ -813,6 +813,28 @@ def test_allow_only(monkeypatch, capsys) -> None:
     assert "license MIT License not in allow-only licenses was found for package" in captured.err
 
 
+def test_allow_only_collect_all_failures(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
+    licenses = (
+        "Apache Software License",
+        "Mozilla Public License 2.0 (MPL 2.0)",
+        "Python Software Foundation License",
+        "Public Domain",
+        "GNU General Public License (GPL)",
+        "GNU Library or Lesser General Public License (LGPL)",
+    )
+    allow_only_args = [
+        f"--allow-only={';'.join(licenses)}",
+        "--collect-all-failures",
+    ]
+    monkeypatch.setattr(sys, "exit", lambda n: None)
+    args = create_parser().parse_args(allow_only_args)
+    create_licenses_table(args)
+
+    captured = capsys.readouterr()
+    assert "license MIT License not in allow-only licenses was found for package" in captured.err
+    assert "license BSD License not in allow-only licenses was found for package" in captured.err
+
+
 def test_allow_only_partial(monkeypatch, capsys) -> None:
     licenses = (
         "Bsd",
@@ -869,6 +891,21 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     captured = capsys.readouterr()
     assert "" == captured.out
     assert "fail-on license MIT License was found for package" in captured.err
+
+
+def test_fail_on_collect_all_failures(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
+    licenses = ("MIT License", "BSD License")
+    fail_on_args = [
+        f"--fail-on={';'.join(licenses)}",
+        "--collect-all-failures",
+    ]
+    monkeypatch.setattr(sys, "exit", lambda n: None)
+    args = create_parser().parse_args(fail_on_args)
+    create_licenses_table(args)
+
+    captured = capsys.readouterr()
+    assert "fail-on license MIT License was found for package" in captured.err
+    assert "fail-on license BSD License was found for package" in captured.err
 
 
 @pytest.mark.parametrize(
