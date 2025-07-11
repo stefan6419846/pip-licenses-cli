@@ -86,11 +86,16 @@ from .cli.CustomHelpFormatter import (
     CustomHelpFormatter,
     enum_key_to_value,
 )
-from .cli.SelectAction import SelectAction
-from .cli.CompatibleArgumentParser import CompatibleArgumentParser
+from .cli.SelectAction import SelectAction as SelectAction  # skipcq: PYL-C0414
+from .cli.CompatibleArgumentParser import CompatibleArgumentParser as CompatibleArgumentParser  # skipcq: PYL-C0414
 from .cli import (
     load_config_from_file,
     create_parser,
+    get_sortby,
+    TOML_SECTION_NAME,
+    create_parser,
+    value_to_enum_key,
+    enum_key_to_value,
 )
 
 from .output import (
@@ -105,6 +110,15 @@ from .output import (
     create_licenses_table,
     factory_styled_table_with_args,
 )
+
+# for testing 1:1 compatibility:
+from .colors import output_colored
+from .PipLicensesWarning import (
+    PipLicensesWarning,
+    create_warn_string,
+)
+from .output import create_licenses_table
+
 
 # Mapping of FIELD_NAMES to METADATA_KEYS where they differ by more than case
 FIELDS_TO_METADATA_KEYS = {
