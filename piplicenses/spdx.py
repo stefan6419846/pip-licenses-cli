@@ -31,23 +31,13 @@ import warnings
 from functools import lru_cache
 from typing import Protocol
 
-from . import __pkgname__ as __pkgname__  # skipcq: PYL-C0414
-
 # from rest of project
-from .errors import (
+from .constants import (
     PIP_LICENSE_CLI_WARN_MSG_SPDX_UNSUPPORTED_CLAUSE,
-    PipLicensesWarning,
+    SYSTEM_PACKAGES,
 )
+from .errors import PipLicensesWarning
 
-SYSTEM_PACKAGES = [
-    __pkgname__,
-    "pip",
-    "pip-licenses-lib",
-    "prettytable",
-    "wcwidth",
-    "setuptools",
-    "wheel",
-]
 if sys.version_info < (3, 11):  # pragma: no cover
     SYSTEM_PACKAGES.append("tomli")
 

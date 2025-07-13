@@ -25,6 +25,13 @@
 
 from __future__ import annotations
 
+# Package version imported for `--version` output
+from ..constants import (
+    __summary__,
+    __version__,
+    TOML_SECTION_NAME,
+)
+
 import sys
 from pathlib import Path
 from typing import Type
@@ -60,30 +67,7 @@ else:  # pragma: no cover
     import tomli as tomllib
 
 
-# Package version imported for `--version` output
-from .. import __version__ as __version__  # skipcq: PYL-C0414
-
-__summary__ = "Dump the software license list of Python packages installed with pip."
-
 open = open  # allow monkey patching
-
-
-# Mapping of FIELD_NAMES to METADATA_KEYS where they differ by more than case
-FIELDS_TO_METADATA_KEYS = {
-    "URL": "homepage",
-    "License-Metadata": "license",
-    "License-Classifier": "license_classifier",
-    "LicenseFile": "license_files",
-    "LicenseText": "license_texts",
-    "NoticeFile": "notice_files",
-    "NoticeText": "notice_texts",
-    "Description": "summary",
-}
-
-
-# toml [tool.pip-licenses] section name
-# Not using __pkgname__ because we want to be backwards compatible
-TOML_SECTION_NAME: str = "pip-licenses"
 
 
 def choices_from_enum(enum_cls: Type[NoValueEnum]) -> list[str]:

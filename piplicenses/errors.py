@@ -33,10 +33,16 @@
 # see https://docs.python.org/3/library/functools.html#functools.partial
 from functools import partial
 
-# from rest of project
-from . import colors
 from .cli.custom_namespace import CustomNamespace
 from .cli.format_arg import FormatArg
+from .constants import (
+    AMBER,
+    PIP_LICENSE_CLI_WARN_MSG_NO_JSON_FILE,
+    PIP_LICENSE_CLI_WARN_MSG_W_SUM_AND_ORDER,
+)
+
+# from rest of project
+from .output import output_colored
 
 
 class PipLicensesWarning(UserWarning):
@@ -45,32 +51,9 @@ class PipLicensesWarning(UserWarning):
     """
 
 
-# Warning string constants
-
-PIP_LICENSE_CLI_WARN_MSG_SPDX_UNSUPPORTED_CLAUSE: str = "SPDX expressions with 'AND' or 'WITH' are currently not supported."
-
-PIP_LICENSE_CLI_WARN_MSG_NO_JSON_FILE: str = "Due to the length of these fields, this option is best paired with --format=json."
-
-# original as a tuple -- causes type regression now -- Unused -- kept for historical note
-# PIP_LICENSE_CLI_WARN_MSG_W_SUM_AND_ORDER: tuple =
-#    (
-#        "When using this option, only --order=count or --order=license has an effect for the --order "
-#        "option. And using --with-authors and --with-urls will be ignored."
-#    )
-# if this is intended, then why?
-
-# otherwise, probably should be:
-
-PIP_LICENSE_CLI_WARN_MSG_W_SUM_AND_ORDER: str = str(
-    "When using this option, only --order=count or --order=license has an effect for the --order "
-    "option. And using --with-authors and --with-urls will be ignored."
-)
-
-
 def create_warn_string(args: CustomNamespace) -> str:
     warn_messages: list = []
-    _ansi_amber_code: str = "33"
-    _warn_out = partial(colors.output_colored, code=_ansi_amber_code)
+    _warn_out = partial(output_colored, code=AMBER)
 
     if args.with_license_file and not args.format_ == FormatArg.JSON:
         message = _warn_out(text=PIP_LICENSE_CLI_WARN_MSG_NO_JSON_FILE)
