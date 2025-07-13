@@ -44,8 +44,10 @@ __version__ = "1.4.0"
 # )
 from piplicenses_lib import FromArg  # noqa: F401
 
+from .constants import TOML_SECTION_NAME  # noqa: F401
+from .constants import FIELDS_TO_METADATA_KEYS  # noqa: F401
+
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .cli import TOML_SECTION_NAME  # noqa: F401
 from .cli import CustomNamespace  # noqa: F401
 from .cli import get_sortby  # noqa: F401
 from .cli import load_config_from_file  # noqa: F401
@@ -67,25 +69,23 @@ from .cli.select_action import SelectAction  # noqa: F401
 from .cli.select_action import value_to_enum_key  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .colors import output_colored  # noqa: F401
+from .output import DEFAULT_OUTPUT_FIELDS  # noqa: F401
+from .output import create_licenses_table  # noqa: F401
+from .output import factory_styled_table_with_args  # noqa: F401
+from .output import get_output_fields  # noqa: F401
+from .output import get_packages  # noqa: F401
+from .output import output_colored  # noqa: F401
+from .output import create_output_string
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
 from .errors import PipLicensesWarning  # noqa: F401
 from .errors import create_warn_string
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .output import DEFAULT_OUTPUT_FIELDS  # noqa: F401
-from .output import create_licenses_table  # noqa: F401
-from .output import factory_styled_table_with_args  # noqa: F401
-from .output import get_output_fields  # noqa: F401
-from .output import get_packages  # noqa: F401
-from .output import create_output_string
-
-# Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .set_ops import case_insensitive_partial_match_set_diff  # noqa: F401
-from .set_ops import case_insensitive_partial_match_set_intersect  # noqa: F401
-from .set_ops import case_insensitive_set_diff  # noqa: F401
-from .set_ops import case_insensitive_set_intersect  # noqa: F401
+from .collection import case_insensitive_partial_match_set_diff  # noqa: F401
+from .collection import case_insensitive_partial_match_set_intersect  # noqa: F401
+from .collection import case_insensitive_set_diff  # noqa: F401
+from .collection import case_insensitive_set_intersect  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
 from .spdx import SYSTEM_PACKAGES  # noqa: F401
@@ -136,19 +136,6 @@ else:  # pragma: no cover
 
 
 open = open  # allow monkey patching
-
-
-# Mapping of FIELD_NAMES to METADATA_KEYS where they differ by more than case
-FIELDS_TO_METADATA_KEYS = {
-    "URL": "homepage",
-    "License-Metadata": "license",
-    "License-Classifier": "license_classifier",
-    "LicenseFile": "license_files",
-    "LicenseText": "license_texts",
-    "NoticeFile": "notice_files",
-    "NoticeText": "notice_texts",
-    "Description": "summary",
-}
 
 
 def save_if_needs(output_file: None | str, output_string: str) -> None:

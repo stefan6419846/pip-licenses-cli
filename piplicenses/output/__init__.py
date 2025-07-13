@@ -25,6 +25,8 @@
 
 from __future__ import annotations
 
+from .colors import output_colored  # noqa: F401
+
 import sys
 from collections import Counter
 from dataclasses import asdict
@@ -43,7 +45,7 @@ from prettytable import HRuleStyle, PrettyTable
 from ..cli import get_sortby
 from ..cli.custom_namespace import CustomNamespace
 from ..cli.format_arg import FormatArg
-from ..set_ops import (
+from ..collection import (
     case_insensitive_partial_match_set_diff,
     case_insensitive_partial_match_set_intersect,
     case_insensitive_set_diff,

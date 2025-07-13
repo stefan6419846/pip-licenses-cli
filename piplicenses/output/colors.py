@@ -23,13 +23,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 # ANSI Color Codes
-RESET: str = "\033[0m"  # Reset all attributes to default
-BOLD: str = "1;"  # Bold text attribute
-
-# Foreground Colors
-AMBER: str = "33"  # Yellow/Amber foreground color
+from ..constants import (
+    BOLD,
+    RESET,
+)
 
 
 def output_colored(code: str, text: str, is_bold: bool = False) -> str:
