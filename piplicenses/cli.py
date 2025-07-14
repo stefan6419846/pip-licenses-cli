@@ -26,40 +26,35 @@
 from __future__ import annotations
 
 # Package version imported for `--version` output
-from ..constants import (
+from .constants import (
     __summary__,
     __version__,
     TOML_SECTION_NAME,
 )
 
+from argparse import (
+    Action,
+    ArgumentParser,
+    HelpFormatter,
+    Namespace,
+)
+import codecs
 import sys
+from enum import Enum, auto
 from pathlib import Path
-from typing import Type
+from typing import (
+    TYPE_CHECKING,
+    Type,
+    cast,
+)
+
+if TYPE_CHECKING:  # pragma: no cover
+    from typing import Optional, Sequence
 
 from piplicenses_lib import (
     FromArg,
     NoValueEnum,
 )
-
-from .compatible_arg_parser import CompatibleArgumentParser
-from .custom_help_formatter import CustomHelpFormatter
-from .custom_namespace import CustomNamespace
-from .format_arg import FormatArg
-from .order_arg import OrderArg
-from .select_action import (
-    SelectAction,
-    get_value_from_enum,
-)
-
-# Triggers F401 -- Unused -- kept for historical note
-# from .custom_help_formatter import enum_key_to_value
-
-# Triggers F401 -- Unused -- kept for historical note
-# from .select_action import (
-#     MAP_DEST_TO_ENUM,
-#     value_to_enum_key,
-# )
-
 
 if sys.version_info >= (3, 11):  # pragma: no cover
     import tomllib
@@ -70,8 +65,161 @@ else:  # pragma: no cover
 open = open  # allow monkey patching
 
 
+class CustomNamespace(Namespace):
+
+    from_: "FromArg"
+    order: "OrderArg"
+    format_: "FormatArg"
+    summary: bool
+    output_file: str
+    ignore_packages: list[str]
+    packages: list[str]
+    with_system: bool
+    with_authors: bool
+    with_urls: bool
+    with_description: bool
+    with_license_file: bool
+    no_license_path: bool
+    with_notice_file: bool
+    filter_strings: bool
+    filter_code_page: str
+    partial_match: bool
+    fail_on: Optional[str]
+    allow_only: Optional[str]
+    collect_all_failures: bool
+
+
+class FormatArg(NoValueEnum):
+
+    PLAIN = P = auto()
+    PLAIN_VERTICAL = auto()
+    MARKDOWN = MD = M = auto()
+    RST = REST = R = auto()
+    CONFLUENCE = C = auto()
+    HTML = H = auto()
+    JSON = J = auto()
+    JSON_LICENSE_FINDER = JLF = auto()
+    CSV = auto()
+
+
+class OrderArg(NoValueEnum):
+
+    COUNT = C = auto()
+    LICENSE = L = auto()
+    NAME = N = auto()
+    AUTHOR = A = auto()
+    MAINTAINER = M = auto()
+    URL = U = auto()
+
+
+MAP_DEST_TO_ENUM: dict[str, type[NoValueEnum]] = {
+    "from_": FromArg,
+    "order": OrderArg,
+    "format_": FormatArg,
+}
+
+
+class SelectAction(Action):
+
+    def __call__(  # type: ignore[override]
+        self,
+        parser: ArgumentParser,
+        namespace: Namespace,
+        values: str,
+        option_string: Optional[str] = None,
+    ) -> None:
+        enum_cls = MAP_DEST_TO_ENUM[self.dest]
+        setattr(namespace, self.dest, get_value_from_enum(enum_cls, values))
+
+
+class CompatibleArgumentParser(ArgumentParser):
+
+    def parse_args(  # type: ignore[override]
+        self,
+        args: None | Sequence[str] = None,
+        namespace: None | CustomNamespace = None,
+    ) -> CustomNamespace:
+        args_ = cast(CustomNamespace, super().parse_args(args, namespace))
+        self._verify_args(args_)
+        return args_
+
+    def _verify_args(self, args: CustomNamespace) -> None:
+        if (args.no_license_path or args.with_notice_file) and not args.with_license_file:
+            self.error("'--no-license-path' and '--with-notice-file' require " "the '--with-license-file' option to be set")
+        if (args.filter_code_page != "latin1") and not args.filter_strings:
+            self.error("'--filter-code-page' requires the '--filter-strings' " "option to be set")
+        try:
+            codecs.lookup(args.filter_code_page)
+        except LookupError:
+            self.error(
+                f"invalid code page {args.filter_code_page!r} given for '--filter-code-page, "
+                "check https://docs.python.org/3/library/codecs.html#standard-encodings "
+                "for valid code pages"
+            )
+
+
+class CustomHelpFormatter(HelpFormatter):  # pragma: no cover
+
+    def __init__(
+        self,
+        prog: str,
+        indent_increment: int = 2,
+        max_help_position: int = 24,
+        width: Optional[int] = None,
+    ) -> None:
+        # Force max_help_position to 30 regardless of the passed-in value
+        max_help_position = 30
+        super().__init__(
+            prog,
+            indent_increment=indent_increment,
+            max_help_position=max_help_position,
+            width=width,
+        )
+
+    def _format_action(self, action: Action) -> str:
+        flag_indent_argument: bool = False
+        # Expand help to detect markers before default formatting
+        text: str = self._expand_help(action)
+        separator_pos = text[:3].find("|")
+        # If the marker 'I' appears before '|', enable indentation
+        if separator_pos != -1 and "I" in text[:separator_pos]:
+            self._indent()
+            flag_indent_argument = True
+        help_str = super()._format_action(action)
+        if flag_indent_argument:
+            self._dedent()
+        return help_str
+
+    def _expand_help(self, action: Action) -> str:
+        if isinstance(action.default, Enum):
+            default_value = enum_key_to_value(action.default)
+            return cast(str, self._get_help_string(action)) % {"default": default_value}
+        return super()._expand_help(action)
+
+    def _split_lines(self, text: str, width: int) -> list[str]:
+        separator_pos = text[:3].find("|")
+        if separator_pos != -1:
+            flag_splitlines: bool = "R" in text[:separator_pos]
+            text = text[separator_pos + 1:]  # fmt: skip
+            if flag_splitlines:
+                return text.splitlines()
+        return super()._split_lines(text, width)
+
+
 def choices_from_enum(enum_cls: Type[NoValueEnum]) -> list[str]:
     return [key.replace("_", "-").lower() for key in enum_cls.__members__.keys()]
+
+
+def enum_key_to_value(enum_key: Enum) -> str:
+    return enum_key.name.replace("_", "-").lower()
+
+
+def get_value_from_enum(enum_cls: Type[NoValueEnum], value: str) -> NoValueEnum:
+    return getattr(enum_cls, value_to_enum_key(value))
+
+
+def value_to_enum_key(value: str) -> str:
+    return value.replace("-", "_").upper()
 
 
 def get_sortby(args: CustomNamespace) -> str:

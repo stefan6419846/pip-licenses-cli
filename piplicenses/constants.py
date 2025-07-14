@@ -62,6 +62,38 @@ FIELDS_TO_METADATA_KEYS: dict = {
     "Description": "summary",
 }
 
+FIELD_NAMES: tuple = (
+    "Name",
+    "Version",
+    "License",
+    "LicenseFile",
+    "LicenseText",
+    "NoticeFile",
+    "NoticeText",
+    "Author",
+    "Maintainer",
+    "Description",
+    "URL",
+)
+
+
+SUMMARY_FIELD_NAMES: tuple = (
+    "Count",
+    "License",
+)
+
+
+DEFAULT_OUTPUT_FIELDS: tuple = (
+    "Name",
+    "Version",
+)
+
+
+SUMMARY_OUTPUT_FIELDS: tuple = (
+    "Count",
+    "License",
+)
+
 
 SYSTEM_PACKAGES: list[str] = [
     __pkgname__,

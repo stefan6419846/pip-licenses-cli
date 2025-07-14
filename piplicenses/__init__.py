@@ -46,6 +46,8 @@ from piplicenses_lib import FromArg  # noqa: F401
 
 from .constants import TOML_SECTION_NAME  # noqa: F401
 from .constants import FIELDS_TO_METADATA_KEYS  # noqa: F401
+from .constants import DEFAULT_OUTPUT_FIELDS  # noqa: F401
+from .constants import SYSTEM_PACKAGES  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
 from .cli import CustomNamespace  # noqa: F401
@@ -54,42 +56,41 @@ from .cli import load_config_from_file  # noqa: F401
 from .cli import create_parser
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .cli.compatible_arg_parser import CompatibleArgumentParser  # noqa: F401
+from .cli import CompatibleArgumentParser  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .cli.custom_help_formatter import CustomHelpFormatter  # noqa: F401
-from .cli.custom_help_formatter import enum_key_to_value  # noqa: F401
-from .cli.format_arg import FormatArg  # noqa: F401
+from .cli import CustomHelpFormatter  # noqa: F401
+from .cli import enum_key_to_value  # noqa: F401
+from .cli import FormatArg  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .cli.order_arg import OrderArg  # noqa: F401
+from .cli import OrderArg  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .cli.select_action import SelectAction  # noqa: F401
-from .cli.select_action import value_to_enum_key  # noqa: F401
+from .cli import SelectAction  # noqa: F401
+from .cli import value_to_enum_key  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .output import DEFAULT_OUTPUT_FIELDS  # noqa: F401
+# from .spdx import SYSTEM_PACKAGES  # noqa: F401
+from .spdx import _get_spdx_parser  # noqa: F401
+
+# Triggers F401 -- Unused -- kept for historical testing backwards compatibility
 from .output import create_licenses_table  # noqa: F401
 from .output import factory_styled_table_with_args  # noqa: F401
 from .output import get_output_fields  # noqa: F401
-from .output import get_packages  # noqa: F401
-from .output import output_colored  # noqa: F401
 from .output import create_output_string
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
+from .errors import output_colored  # noqa: F401
 from .errors import PipLicensesWarning  # noqa: F401
 from .errors import create_warn_string
 
 # Triggers F401 -- Unused -- kept for historical testing backwards compatibility
+from .collection import get_packages  # noqa: F401
 from .collection import case_insensitive_partial_match_set_diff  # noqa: F401
 from .collection import case_insensitive_partial_match_set_intersect  # noqa: F401
 from .collection import case_insensitive_set_diff  # noqa: F401
 from .collection import case_insensitive_set_intersect  # noqa: F401
-
-# Triggers F401 -- Unused -- kept for historical testing backwards compatibility
-from .spdx import SYSTEM_PACKAGES  # noqa: F401
-from .spdx import _get_spdx_parser  # noqa: F401
 
 # Triggers F401 -- Unused -- kept for historical note
 # from .spdx import (
