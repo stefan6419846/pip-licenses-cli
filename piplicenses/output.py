@@ -26,7 +26,7 @@
 from __future__ import annotations
 
 # ANSI Color Codes
-from ..constants import (
+from .constants import (
     SUMMARY_FIELD_NAMES,
     DEFAULT_OUTPUT_FIELDS,
     SUMMARY_OUTPUT_FIELDS,
@@ -35,18 +35,20 @@ from ..constants import (
 
 import sys
 from collections import Counter
-from typing import TYPE_CHECKING, cast
-
+from typing import (
+    TYPE_CHECKING,
+    cast,
+)
 from piplicenses_lib import (
     LICENSE_UNKNOWN,
     FromArg,
 )
 from prettytable import HRuleStyle, PrettyTable
 
-from ..cli import get_sortby
-from ..cli import CustomNamespace
-from ..cli import FormatArg
-from ..collection import (
+from .cli import get_sortby
+from .cli import CustomNamespace
+from .cli import FormatArg
+from .collection import (
     get_packages,
 )
 
@@ -60,15 +62,114 @@ else:  # pragma: no cover
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Sequence
+    from prettytable import RowType
 
-from .csv import CSVPrettyTable
-from .json import (
-    JsonLicenseFinderTable,
-    JsonPrettyTable,
-)
-from .plain import PlainVerticalTable
 
 open = open  # allow monkey patching
+
+
+class CSVPrettyTable(PrettyTable):
+    """PrettyTable-like class exporting to CSV"""
+
+    def get_string(self, **kwargs: str | list[str]) -> str:
+
+        def esc_quotes(val: bytes | str) -> str:
+            """
+            Meta-escaping double quotes
+            https://tools.ietf.org/html/rfc4180
+            """
+            try:
+                return cast(str, val).replace('"', '""')
+            except UnicodeDecodeError:  # pragma: no cover
+                return cast(bytes, val).decode("utf-8").replace('"', '""')
+            except UnicodeEncodeError:  # pragma: no cover
+                return str(cast(str, val).encode("unicode_escape").replace('"', '""'))  # type: ignore[arg-type]
+
+        # Retrieve formatting options (fields, limits, header flag, etc.)
+        options = self._get_options(kwargs)
+        # Build rows based on options.
+        rows = self._get_rows(options)
+        # Format rows via PrettyTable's own formatting logic.
+        formatted_rows = self._format_rows(rows)
+        lines: list[str] = []
+        # Create CSV header line, with each field name escaped and quoted.
+        formatted_header = ",".join([f'"{esc_quotes(val)}"' for val in self._field_names])
+        lines.append(formatted_header)
+        # Create CSV data lines.
+        lines.extend([",".join([f'"{esc_quotes(val)}"' for val in row]) for row in formatted_rows])
+        # Join all lines with newline separators.
+        return "\n".join(lines)
+
+
+class JsonPrettyTable(PrettyTable):
+    """PrettyTable-like class exporting to JSON"""
+
+    def format_row(self, row: RowType) -> dict[str, str | list[str]]:
+        resrow: dict[str, str | list[str]] = {}
+        for field, value in zip(self._field_names, row):
+            resrow[field] = value
+
+        return resrow
+
+    def get_string(self, **kwargs: str | list[str]) -> str:
+        # import included here in order to limit dependencies
+        # if not interested in JSON output,
+        # then the dependency is not required
+        import json
+
+        # Fetch formatting options (e.g., selected fields, row slice)
+        options = self._get_options(kwargs)
+        # Retrieve rows based on options
+        rows = self._get_rows(options)
+        # Convert rows to list of dicts
+        lines = [self.format_row(row) for row in rows]
+        # Serialize to JSON with indentation and sorted keys
+        return json.dumps(lines, indent=2, sort_keys=True)
+
+
+class JsonLicenseFinderTable(JsonPrettyTable):
+
+    def format_row(self, row: RowType) -> dict[str, str | list[str]]:
+        resrow: dict[str, str | list[str]] = {}
+        for field, value in zip(self._field_names, row):
+            if field == "Name":
+                resrow["name"] = value
+            if field == "Version":
+                resrow["version"] = value
+            if field == "License":
+                resrow["licenses"] = [value]
+        return resrow
+
+    def get_string(self, **kwargs: str | list[str]) -> str:
+        # import included here in order to limit dependencies
+        # if not interested in JSON output,
+        # then the dependency is not required
+        import json
+
+        options = self._get_options(kwargs)
+        rows = self._get_rows(options)
+        lines = [self.format_row(row) for row in rows]
+        return json.dumps(lines, sort_keys=True)
+
+
+class PlainVerticalTable(PrettyTable):
+    """PrettyTable for outputting to a simple non-column based style.
+
+    When used with --with-license-file, this style is similar to the default
+    style generated from Angular CLI's --extractLicenses flag.
+    """
+
+    def get_string(self, **kwargs: str | list[str]) -> str:
+        options = self._get_options(kwargs)
+        rows = self._get_rows(options)
+
+        output = ""
+        for row in rows:
+            for v in row:
+                output += "{}\n".format(v)
+            output += "\n"
+
+        return output
 
 
 def factory_styled_table_with_args(
