@@ -33,16 +33,25 @@
 # see https://docs.python.org/3/library/functools.html#functools.partial
 from functools import partial
 
-from .cli.custom_namespace import CustomNamespace
-from .cli.format_arg import FormatArg
+from .cli import CustomNamespace
+from .cli import FormatArg
 from .constants import (
     AMBER,
+    BOLD,
+    RESET,
     PIP_LICENSE_CLI_WARN_MSG_NO_JSON_FILE,
     PIP_LICENSE_CLI_WARN_MSG_W_SUM_AND_ORDER,
 )
 
-# from rest of project
-from .output import output_colored
+
+def output_colored(code: str, text: str, is_bold: bool = False) -> str:
+    """
+    Create function to output with color sequence
+    """
+    if is_bold:
+        code = f"{BOLD}{code}"
+
+    return f"\033[{code}m{text}{RESET}"
 
 
 class PipLicensesWarning(UserWarning):
