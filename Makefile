@@ -1,6 +1,6 @@
 # based on remote (requires remote named origin)
 # REPO_NAME:=$(shell basename -s .git `git remote get-url origin`)
-# get the local clone directory name (always will exsist in clones, even if you call your remote fork on github "github" and setup the remote "upstream")
+# get the local clone directory name (always will exist in clones, even if you call your remote fork on github "github" and setup the remote "upstream")
 REPO_NAME:=$(shell basename `git rev-parse --show-toplevel`)
 VENV_NAME:='venv/$(REPO_NAME)'
 DEV_DEPENDS:='requirements/dev'
