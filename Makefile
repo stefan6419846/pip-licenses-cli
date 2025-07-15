@@ -73,12 +73,16 @@ clean:
 	rm -rf dist
 
 
-# full hard reset
-.PHONY: nuke
-nuke:: local-uninstall clean
+# full clean
+.PHONY: full-clean
+full-clean:: local-uninstall clean
 	rm -rf *.egg-info || : ;
-	rm -vfRd ./**/__pycache__ 2>/dev/null || : ;
-	rm -vfRd ./piplicenses/**/__pycache__ 2>/dev/null || : ;
+	rm -vfRd ./piplicenses/__pycache__ 2>/dev/null || : ;
 	rm -vfRd ./.coverage 2>/dev/null || : ;
 	rm -vfRd ./.mypy_cache 2>/dev/null || : ;
 	rm -vfRd ./.pytest_cache 2>/dev/null || : ;
+
+# hard reset
+.PHONY: un-setup
+un-setup:: full-clean
+	rm -vfRd ./venv 2>/dev/null || : ;
