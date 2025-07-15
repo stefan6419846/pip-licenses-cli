@@ -110,13 +110,9 @@ docker/*
 
 # macOS
 .DS_Store
-*/.DS_Store
-.*/*/.DS_Store
 
 # IDE
 .idea
 *.iml
 *.xcworkspace
-*.xcworkspace/*
 *.xcodeproj
-*.xcodeproj/*
