@@ -494,6 +494,11 @@ $ echo $?
 0
 ```
 
+#### Option: collect\-all\-failures
+
+If set, collects all license failures and reports them after processing all packages.
+Defaults to throwing an error after first failure.
+
 ### pyproject.toml support
 
 All command-line options for `pip-licenses` can be configured using the `pyproject.toml` file under the `[tool.pip-licenses]` section. 
