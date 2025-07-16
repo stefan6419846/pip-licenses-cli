@@ -76,13 +76,13 @@ clean:
 # full clean
 .PHONY: full-clean
 full-clean:: local-uninstall clean
-	rm -rf *.egg-info || : ;
-	rm -vfRd ./piplicenses/__pycache__ 2>/dev/null || : ;
-	rm -vfRd ./.coverage 2>/dev/null || : ;
-	rm -vfRd ./.mypy_cache 2>/dev/null || : ;
-	rm -vfRd ./.pytest_cache 2>/dev/null || : ;
+	rm -vrf *.egg-info || : ;
+	rm -vfrd ./piplicenses/__pycache__ 2>/dev/null || : ;
+	rm -vfrd ./.coverage 2>/dev/null || : ;
+	rm -vfrd ./.mypy_cache 2>/dev/null || : ;
+	rm -vfrd ./.pytest_cache 2>/dev/null || : ;
 
 # hard reset
 .PHONY: un-setup
 un-setup:: full-clean
-	rm -vfRd ./venv 2>/dev/null || : ;
+	rm -vfrd ./venv 2>/dev/null || : ;
