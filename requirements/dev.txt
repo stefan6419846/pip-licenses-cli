@@ -82,7 +82,7 @@ mypy-extensions==1.1.0
     # via
     #   black
     #   mypy
-nh3==0.2.21
+nh3==0.2.22
     # via readme-renderer
 packaging==25.0
     # via
