@@ -690,7 +690,7 @@ class TestGetLicenses(CommandLineTestCase):
 
         licenses = parse_licenses_list(licenses_str)
 
-        self.assertTrue(["MIT License", "MIT", "Apache-2.0"] == licenses)
+        self.assertListEqual(["MIT License", "MIT", "Apache-2.0"], licenses)
 
     def test_case_insensitive_set_diff(self) -> None:
         set_a = {"MIT License"}
