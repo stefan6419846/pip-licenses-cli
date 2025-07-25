@@ -188,19 +188,29 @@ def _get_spdx_parser() -> SpdxParser:
     return parser
 
 
+def parse_licenses_list(licenses_str: str | None) -> list[str]:
+    if licenses_str is None:
+        return []
+
+    licenses = licenses_str.split(";")
+
+    # Strip items
+    licenses = [license.strip() for license in licenses]
+
+    # Remove empty string items
+    licenses = [license for license in licenses if license != ""]
+
+    return licenses
+
+
 def get_packages(
     args: CustomNamespace,
 ) -> Iterator[PackageInfo]:
     ignore_pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.ignore_packages]
     pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.packages]
 
-    fail_on_licenses = set()
-    if args.fail_on:
-        fail_on_licenses = set(map(str.strip, args.fail_on.split(";")))
-
-    allow_only_licenses = set()
-    if args.allow_only:
-        allow_only_licenses = set(map(str.strip, args.allow_only.split(";")))
+    fail_on_licenses = set(parse_licenses_list(args.fail_on))
+    allow_only_licenses = set(parse_licenses_list(args.allow_only))
 
     include_files = args.with_license_file or args.with_notice_file
     failures = []
@@ -248,11 +258,13 @@ def get_packages(
 
         fail_this_pkg = False
         fail_message = ""
+
         if fail_on_licenses:
             if not args.partial_match:
                 failed_licenses = case_insensitive_set_intersect(parsed_license_names, fail_on_licenses)
             else:
                 failed_licenses = case_insensitive_partial_match_set_intersect(parsed_license_names, fail_on_licenses)
+
             if failed_licenses:
                 fail_this_pkg = True
                 fail_message = "fail-on license {} was found for package {}:{}\n".format(
@@ -260,11 +272,13 @@ def get_packages(
                     pkg_info.name,
                     pkg_info.version,
                 )
+
         if allow_only_licenses:
             if not args.partial_match:
                 uncommon_licenses = case_insensitive_set_diff(parsed_license_names, allow_only_licenses)
             else:
                 uncommon_licenses = case_insensitive_partial_match_set_diff(parsed_license_names, allow_only_licenses)
+
             if len(uncommon_licenses) == len(parsed_license_names):
                 fail_this_pkg = True
                 fail_message = "license {} not in allow-only licenses was found for package {}:{}\n".format(
@@ -272,6 +286,7 @@ def get_packages(
                     pkg_info.name,
                     pkg_info.version,
                 )
+
         if fail_this_pkg:
             if args.collect_all_failures:
                 failures.append(fail_message)
