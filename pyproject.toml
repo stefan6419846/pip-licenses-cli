@@ -64,7 +64,7 @@ Releases = "https://github.com/stefan6419846/pip-licenses-cli/releases"
 Issues = "https://github.com/stefan6419846/pip-licenses-cli/issues"
 
 [project.scripts]
-pip-licenses = "piplicenses:main"
+pip-licenses = "piplicenses.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
