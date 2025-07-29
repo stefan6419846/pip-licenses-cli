@@ -26,7 +26,7 @@ click==8.1.8
     # via
     #   black
     #   pip-tools
-coverage[toml]==7.9.2
+coverage[toml]==7.10.0
     # via pytest-cov
 cryptography==45.0.5
     # via pip-licenses-cli (pyproject.toml)
@@ -64,7 +64,7 @@ jaraco-functools==4.2.1
     # via keyring
 keyring==25.6.0
     # via twine
-license-expression==30.4.3
+license-expression==30.4.4
     # via pip-licenses-cli (pyproject.toml)
 markdown-it-py==3.0.0
     # via rich
@@ -140,7 +140,7 @@ requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==14.0.0
+rich==14.1.0
     # via twine
 tomli==2.2.1 ; python_version < "3.11"
     # via
@@ -158,7 +158,7 @@ twine==6.1.0
     # via pip-licenses-cli (pyproject.toml)
 types-colorama==0.4.15.20240311
     # via pip-licenses-cli (pyproject.toml)
-types-docutils==0.21.0.20250715
+types-docutils==0.21.0.20250722
     # via
     #   pip-licenses-cli (pyproject.toml)
     #   types-pygments

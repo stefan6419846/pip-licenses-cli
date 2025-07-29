@@ -1,8 +1,11 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (c) 2018 raimon
+# SPDX-FileCopyrightText: Copyright (c) 2025 stefan6419846
+
 from __future__ import annotations
 
 import copy
 import email
-import os
 import re
 import sys
 import tempfile
@@ -11,7 +14,6 @@ import venv
 from enum import Enum, auto
 from importlib.metadata import Distribution
 from pathlib import Path
-from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
 
 import docutils.frontend
@@ -23,33 +25,13 @@ import tomli_w
 from prettytable import HRuleStyle
 from pytest import CaptureFixture, MonkeyPatch
 
-try:
-    import license_expression
-except ImportError:
-    license_expression = None  # type: ignore[assignment]
-
-import piplicenses
-from piplicenses import (
-    DEFAULT_OUTPUT_FIELDS,
-    SYSTEM_PACKAGES,
-    TOML_SECTION_NAME,
+from piplicenses.cli import (
     CompatibleArgumentParser,
-    FromArg,
-    PipLicensesWarning,
-    __pkgname__,
-    _get_spdx_parser,
-    case_insensitive_partial_match_set_diff,
-    case_insensitive_partial_match_set_intersect,
-    case_insensitive_set_diff,
-    case_insensitive_set_intersect,
-    create_licenses_table,
     create_output_string,
     create_parser,
     create_warn_string,
     enum_key_to_value,
-    factory_styled_table_with_args,
     get_output_fields,
-    get_packages,
     get_sortby,
     load_config_from_file,
     output_colored,
@@ -57,8 +39,30 @@ from piplicenses import (
     save_if_needs,
     value_to_enum_key,
 )
+from piplicenses.collector import (
+    case_insensitive_partial_match_set_diff,
+    case_insensitive_partial_match_set_intersect,
+    case_insensitive_set_diff,
+    case_insensitive_set_intersect,
+    get_packages,
+)
+from piplicenses.constants import DEFAULT_OUTPUT_FIELDS, SYSTEM_PACKAGES, TOML_SECTION_NAME
+from piplicenses.errors import PipLicensesWarning
+from piplicenses.output import create_licenses_table, factory_styled_table_with_args
+from piplicenses.spdx import _get_spdx_parser
+
+try:
+    import license_expression
+except ImportError:
+    license_expression = None  # type: ignore[assignment]
+
+import piplicenses
+from piplicenses import __pkgname__
 
 if TYPE_CHECKING:
+    import os
+    from types import SimpleNamespace
+
     if sys.version_info >= (3, 10):
         from importlib.metadata._meta import PackageMetadata
     else:
@@ -121,7 +125,6 @@ class TestGetLicenses(CommandLineTestCase):
     def _create_pkg_name_columns(self, table):
         index = DEFAULT_OUTPUT_FIELDS.index("Name")
 
-        # XXX: access to private API
         rows = copy.deepcopy(table.rows)
         pkg_name_columns = []
         for row in rows:
@@ -132,7 +135,6 @@ class TestGetLicenses(CommandLineTestCase):
     def _create_license_columns(self, table, output_fields):
         index = output_fields.index("License")
 
-        # XXX: access to private API
         rows = copy.deepcopy(table.rows)
         pkg_name_columns = []
         for row in rows:
@@ -664,25 +666,25 @@ class TestGetLicenses(CommandLineTestCase):
     def test_without_filter(self) -> None:
         self._patch_distributions()
         args = self.parser.parse_args([])
-        packages = list(piplicenses.get_packages(args))
+        packages = list(piplicenses.collector.get_packages(args))
         self.assertIn(UNICODE_APPENDIX, packages[-1].name)
 
     def test_with_default_filter(self) -> None:
         self._patch_distributions()
         args = self.parser.parse_args(["--filter-strings"])
-        packages = list(piplicenses.get_packages(args))
+        packages = list(piplicenses.collector.get_packages(args))
         self.assertNotIn(UNICODE_APPENDIX, packages[-1].name)
 
     def test_with_default_filter_and_license_file(self) -> None:
         self._patch_distributions()
         args = self.parser.parse_args(["--filter-strings", "--with-license-file"])
-        packages = list(piplicenses.get_packages(args))
+        packages = list(piplicenses.collector.get_packages(args))
         self.assertNotIn(UNICODE_APPENDIX, packages[-1].name)
 
     def test_with_specified_filter(self) -> None:
         self._patch_distributions()
         args = self.parser.parse_args(["--filter-strings", "--filter-code-page=ascii"])
-        packages = list(piplicenses.get_packages(args))
+        packages = list(piplicenses.collector.get_packages(args))
         self.assertNotIn(UNICODE_APPENDIX, packages[-1].summary)
 
     def test_parse_licenses_list(self) -> None:
@@ -753,25 +755,25 @@ def test_output_file_success(monkeypatch, capsys) -> None:
     def mocked_open(*args, **kwargs):
         return tempfile.TemporaryFile("w")
 
-    monkeypatch.setattr(piplicenses, "open", mocked_open)
+    monkeypatch.setattr(piplicenses.cli, "open", mocked_open)
     monkeypatch.setattr(sys, "exit", lambda n: None)
 
     save_if_needs("/foo/bar.txt", "license list")
     captured = capsys.readouterr()
     assert "created path: " in captured.out
-    assert "" == captured.err
+    assert captured.err == ""
 
 
 def test_output_file_error(monkeypatch, capsys) -> None:
     def mocked_open(*args, **kwargs):
-        raise IOError
+        raise OSError
 
-    monkeypatch.setattr(piplicenses, "open", mocked_open)
+    monkeypatch.setattr(piplicenses.cli, "open", mocked_open)
     monkeypatch.setattr(sys, "exit", lambda n: None)
 
     save_if_needs("/foo/bar.txt", "license list")
     captured = capsys.readouterr()
-    assert "" == captured.out
+    assert captured.out == ""
     assert "check path: " in captured.err
 
 
@@ -780,8 +782,8 @@ def test_output_file_none(monkeypatch, capsys) -> None:
     captured = capsys.readouterr()
 
     # stdout and stderr are expected not to be called
-    assert "" == captured.out
-    assert "" == captured.err
+    assert captured.out == ""
+    assert captured.err == ""
 
 
 def test_output_file_content(monkeypatch, capsys) -> None:
@@ -798,7 +800,7 @@ def test_output_file_content(monkeypatch, capsys) -> None:
 
     captured = capsys.readouterr()
     assert f"created path: {fd.name}\n" * 2 == captured.out
-    assert "" == captured.err
+    assert captured.err == ""
 
 
 def test_allow_only(monkeypatch, capsys) -> None:
@@ -817,7 +819,7 @@ def test_allow_only(monkeypatch, capsys) -> None:
     create_licenses_table(args)
 
     captured = capsys.readouterr()
-    assert "" == captured.out
+    assert captured.out == ""
     assert "license MIT License not in allow-only licenses was found for package" in captured.err
 
 
@@ -862,13 +864,11 @@ def test_allow_only_partial(monkeypatch, capsys) -> None:
     create_licenses_table(args)
 
     captured = capsys.readouterr()
-    assert "" == captured.out
+    assert captured.out == ""
     assert "license MIT License not in allow-only licenses was found for package" in captured.err
 
 
 def test_different_python() -> None:
-    import tempfile
-
     class TempEnvBuild(venv.EnvBuilder):
         def post_setup(self, context: SimpleNamespace) -> None:
             self.context = context
@@ -880,8 +880,7 @@ def test_different_python() -> None:
         python_arg = f"--python={python_exec}"
         args = create_parser().parse_args([python_arg, "-s", "-f=json"])
         pkgs = get_packages(args)
-        package_names = sorted(set(p.name for p in pkgs))
-        print(package_names)
+        package_names = sorted({p.name for p in pkgs})
 
     expected_packages = ["pip"]
     if sys.version_info < (3, 12, 0):
@@ -897,7 +896,7 @@ def test_fail_on(monkeypatch: MonkeyPatch, capsys: CaptureFixture) -> None:
     create_licenses_table(args)
 
     captured = capsys.readouterr()
-    assert "" == captured.out
+    assert captured.out == ""
     assert "fail-on license MIT License was found for package" in captured.err
 
 
@@ -1018,7 +1017,7 @@ def test_fail_on_partial_match(monkeypatch, capsys) -> None:
     create_licenses_table(args)
 
     captured = capsys.readouterr()
-    assert "" == captured.out
+    assert captured.out == ""
     assert "fail-on license MIT License was found for package" in captured.err
 
 
@@ -1105,7 +1104,7 @@ def test_pyproject_toml_args_parsed_correctly():
         tool_conf = pyproject_conf["tool"][TOML_SECTION_NAME]
 
         # assert values are correctly parsed from toml
-        assert args.from_ == FromArg.CLASSIFIER
+        assert args.from_ == piplicenses_lib.FromArg.CLASSIFIER
         assert args.summary == tool_conf["summary"]
         assert args.ignore_packages == tool_conf["ignore-packages"]
         assert args.fail_on == tool_conf["fail-on"]
@@ -1113,8 +1112,8 @@ def test_pyproject_toml_args_parsed_correctly():
         # assert args are rewritable using cli
         args = parser.parse_args(["--from=meta"])
 
-        assert args.from_ != FromArg.CLASSIFIER
-        assert args.from_ == FromArg.META
+        assert args.from_ != piplicenses_lib.FromArg.CLASSIFIER
+        assert args.from_ == piplicenses_lib.FromArg.META
 
         # all other are parsed from toml
         assert args.summary == tool_conf["summary"]
