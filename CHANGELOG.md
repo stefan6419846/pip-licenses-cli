@@ -1,3 +1,8 @@
+# Version 2.0.0 - 2025-07-30
+
+* Fix partial matching for empty entries in the given license list.
+* Improve modularization by replacing the single file module with appropriate submodules.
+
 # Version 1.4.0 - 2025-07-02
 
 * Add new flag `--collect-all-failures` to collect all failures before exiting.
