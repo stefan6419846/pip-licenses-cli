@@ -22,19 +22,29 @@ if TYPE_CHECKING:  # pragma: no cover
     from piplicenses.cli import CustomNamespace
 
 
+def parse_licenses_list(licenses_str: str | None) -> list[str]:
+    if licenses_str is None:
+        return []
+
+    licenses = licenses_str.split(";")
+
+    # Strip items
+    licenses = list(map(str.strip, licenses))
+
+    # Remove empty string items
+    licenses = list(filter(None, licenses))
+
+    return licenses
+
+
 def get_packages(
     args: CustomNamespace,
 ) -> Iterator[PackageInfo]:
     ignore_pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.ignore_packages]
     pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.packages]
 
-    fail_on_licenses = set()
-    if args.fail_on:
-        fail_on_licenses = set(map(str.strip, args.fail_on.split(";")))
-
-    allow_only_licenses = set()
-    if args.allow_only:
-        allow_only_licenses = set(map(str.strip, args.allow_only.split(";")))
+    fail_on_licenses = set(parse_licenses_list(args.fail_on))
+    allow_only_licenses = set(parse_licenses_list(args.allow_only))
 
     include_files = args.with_license_file or args.with_notice_file
     failures = []

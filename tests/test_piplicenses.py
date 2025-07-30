@@ -44,6 +44,7 @@ from piplicenses.collector import (
     case_insensitive_set_diff,
     case_insensitive_set_intersect,
     get_packages,
+    parse_licenses_list,
 )
 from piplicenses.constants import DEFAULT_OUTPUT_FIELDS, SYSTEM_PACKAGES, TOML_SECTION_NAME
 from piplicenses.errors import PipLicensesWarning
@@ -685,6 +686,13 @@ class TestGetLicenses(CommandLineTestCase):
         args = self.parser.parse_args(["--filter-strings", "--filter-code-page=ascii"])
         packages = list(piplicenses.collector.get_packages(args))
         self.assertNotIn(UNICODE_APPENDIX, packages[-1].summary)
+
+    def test_parse_licenses_list(self) -> None:
+        licenses_str = " MIT License;;  MIT    ;  Apache-2.0;;;    "
+
+        licenses = parse_licenses_list(licenses_str)
+
+        self.assertListEqual(["MIT License", "MIT", "Apache-2.0"], licenses)
 
     def test_case_insensitive_set_diff(self) -> None:
         set_a = {"MIT License"}
