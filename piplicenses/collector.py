@@ -21,6 +21,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from piplicenses.cli import CustomNamespace
 
+
 def parse_licenses_list(licenses_str: str | None) -> list[str]:
     if licenses_str is None:
         return []
@@ -28,12 +29,13 @@ def parse_licenses_list(licenses_str: str | None) -> list[str]:
     licenses = licenses_str.split(";")
 
     # Strip items
-    licenses = [license.strip() for license in licenses]
+    licenses = list(map(str.strip, licenses))
 
     # Remove empty string items
-    licenses = [license for license in licenses if license != ""]
+    licenses = list(filter(None, licenses))
 
     return licenses
+
 
 def get_packages(
     args: CustomNamespace,

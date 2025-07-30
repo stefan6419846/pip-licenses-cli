@@ -35,7 +35,6 @@ from piplicenses.cli import (
     get_sortby,
     load_config_from_file,
     output_colored,
-    parse_licenses_list,
     save_if_needs,
     value_to_enum_key,
 )
@@ -45,6 +44,7 @@ from piplicenses.collector import (
     case_insensitive_set_diff,
     case_insensitive_set_intersect,
     get_packages,
+    parse_licenses_list,
 )
 from piplicenses.constants import DEFAULT_OUTPUT_FIELDS, SYSTEM_PACKAGES, TOML_SECTION_NAME
 from piplicenses.errors import PipLicensesWarning
