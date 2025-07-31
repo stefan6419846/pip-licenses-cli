@@ -27,7 +27,7 @@ venv:
 
 $(VENV_NAME): venv
 	test -d $(VENV_NAME) || python -m venv $(VENV_NAME)
-	test -d $(VENV_NAME) || exit 1 ; # venv not working right
+	test -d $(VENV_NAME) || exit 1 ;
 
 .PHONY: setup
 setup: $(VENV_NAME)
