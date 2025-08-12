@@ -13,7 +13,7 @@ jobs:
       matrix:
         python: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14-dev']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: setup test environment
         uses: actions/setup-python@v5
         with:
