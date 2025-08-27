@@ -166,7 +166,7 @@ types-pexpect==4.9.0.20250809
     # via pip-licenses-cli (pyproject.toml)
 types-pygments==2.19.0.20250809
     # via pip-licenses-cli (pyproject.toml)
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   black
     #   exceptiongroup
