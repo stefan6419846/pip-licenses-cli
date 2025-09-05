@@ -154,7 +154,7 @@ tomli==2.2.1 ; python_version < "3.11"
     #   pytest
 tomli-w==1.2.0
     # via pip-licenses-cli (pyproject.toml)
-twine==6.1.0
+twine==6.2.0
     # via pip-licenses-cli (pyproject.toml)
 types-colorama==0.4.15.20250801
     # via pip-licenses-cli (pyproject.toml)
