@@ -127,7 +127,7 @@ pyproject-hooks==1.2.0
 pytest==8.4.2
     # via
     #   pytest-cov
-pytest-cov==6.2.1
+pytest-cov==6.3.0
     # via pip-licenses-cli (pyproject.toml)
 readme-renderer==44.0
     # via twine
