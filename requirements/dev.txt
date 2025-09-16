@@ -162,7 +162,7 @@ types-docutils==0.22.0.20250914
     # via
     #   pip-licenses-cli (pyproject.toml)
     #   types-pygments
-types-pexpect==4.9.0.20250809
+types-pexpect==4.9.0.20250916
     # via pip-licenses-cli (pyproject.toml)
 types-pygments==2.19.0.20250809
     # via pip-licenses-cli (pyproject.toml)
