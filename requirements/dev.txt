@@ -158,7 +158,7 @@ twine==6.2.0
     # via pip-licenses-cli (pyproject.toml)
 types-colorama==0.4.15.20250801
     # via pip-licenses-cli (pyproject.toml)
-types-docutils==0.22.0.20250914
+types-docutils==0.22.0.20250919
     # via
     #   pip-licenses-cli (pyproject.toml)
     #   types-pygments
