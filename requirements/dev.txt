@@ -10,7 +10,7 @@ autopep8==2.3.2
     # via pip-licenses-cli (pyproject.toml)
 backports-tarfile==1.2.0
     # via jaraco-context
-black==25.1.0
+black==25.9.0
     # via pip-licenses-cli (pyproject.toml)
 boolean-py==5.0
     # via license-expression
