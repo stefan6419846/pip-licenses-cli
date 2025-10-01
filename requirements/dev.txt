@@ -28,7 +28,7 @@ click==8.1.8
     #   pip-tools
 coverage[toml]==7.10.7
     # via pytest-cov
-cryptography==46.0.1
+cryptography==46.0.2
     # via pip-licenses-cli (pyproject.toml)
 docutils==0.22.2
     # via
