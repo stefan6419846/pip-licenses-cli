@@ -12,6 +12,9 @@ https://getcomposer.org/doc/03-cli.md#licenses
 This is a fork of the original [pip-licenses](https://github.com/raimon49/pip-licenses) project. While `pip-licenses-cli` provides a CLI,
 [pip-licenses-lib](https://github.com/stefan6419846/pip-licenses-lib) provides the library functionality. The CLI builds upon the library.
 
+`pip-licenses-cli` is usable as a drop-in replacement for `pip-licenses<=5.0.0`. More recent versions might be compatible, but use a
+partially different code base and possibly other/additional parameters for example.
+
 ## Installation
 
 You can install this package from PyPI:
