@@ -140,7 +140,7 @@ requests-toolbelt==1.0.0
     # via twine
 rfc3986==2.0.0
     # via twine
-rich==14.1.0
+rich==14.2.0
     # via twine
 tomli==2.3.0 ; python_version < "3.11"
     # via
