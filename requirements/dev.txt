@@ -142,7 +142,7 @@ rfc3986==2.0.0
     # via twine
 rich==14.1.0
     # via twine
-tomli==2.2.1 ; python_version < "3.11"
+tomli==2.3.0 ; python_version < "3.11"
     # via
     #   autopep8
     #   black
