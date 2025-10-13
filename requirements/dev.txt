@@ -45,7 +45,7 @@ flake8-bugbear==24.12.12
     # via pip-licenses-cli (pyproject.toml)
 id==1.5.0
     # via twine
-idna==3.10
+idna==3.11
     # via requests
 importlib-metadata==8.7.0
     # via
