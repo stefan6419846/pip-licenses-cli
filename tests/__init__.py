@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import os
-import sys
 from contextlib import redirect_stderr, redirect_stdout
 from email.message import Message
 from functools import cached_property
@@ -13,7 +12,7 @@ from importlib.metadata import Distribution
 from io import StringIO
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Optional, Type
+from typing import TYPE_CHECKING, Any
 from unittest import TestCase
 
 import piplicenses_lib
@@ -21,10 +20,7 @@ import piplicenses_lib
 from piplicenses.cli import create_parser
 
 if TYPE_CHECKING:
-    if sys.version_info >= (3, 10):
-        from importlib.metadata._meta import PackageMetadata
-    else:
-        from email.message import Message as PackageMetadata
+    from importlib.metadata._meta import PackageMetadata
 
 
 TESTS_PATH = Path(__file__).resolve().parent
@@ -74,7 +70,7 @@ class CaptureOutput:
         self._stdout_buffer: StringIO = StringIO()
         self._stderr_buffer: StringIO = StringIO()
 
-    def __enter__(self) -> "CaptureOutput":
+    def __enter__(self) -> CaptureOutput:
         self._stdout_redirect = redirect_stdout(self._stdout_buffer)
         self._stderr_redirect = redirect_stderr(self._stderr_buffer)
         self._stdout_redirect.__enter__()
@@ -83,9 +79,9 @@ class CaptureOutput:
 
     def __exit__(
         self,
-        exception_type: Optional[Type[BaseException]],
-        exception_value: Optional[BaseException],
-        exception_traceback: Optional[TracebackType],
+        exception_type: type[BaseException] | None,
+        exception_value: BaseException | None,
+        exception_traceback: TracebackType | None,
     ) -> None:
         self._stderr_redirect.__exit__(exception_type, exception_value, exception_traceback)
         self._stdout_redirect.__exit__(exception_type, exception_value, exception_traceback)

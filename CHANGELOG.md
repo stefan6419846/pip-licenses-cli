@@ -1,3 +1,8 @@
+# Development Version
+
+* Drop support for Python 3.9.
+* Migrate tests to plain *unittest* functionality.
+
 # Version 2.0.0 - 2025-07-30
 
 * Fix partial matching for empty entries in the given license list.
