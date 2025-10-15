@@ -16,3 +16,4 @@ tomli==2.3.0 ; python_version < "3.11"
 tomli-w==1.2.0
 twine==6.2.0
 types-docutils==0.22.2.20251006
+wheel==0.45.1

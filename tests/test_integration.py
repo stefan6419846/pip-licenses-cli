@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (c) 2018 raimon
 # SPDX-FileCopyrightText: Copyright (c) 2025 stefan6419846
+
 import copy
 import sys
 import venv
@@ -9,9 +10,10 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest import mock
 
-from piplicenses_lib import __pkgname__, normalize_package_name
+from piplicenses_lib import normalize_package_name
 from prettytable import HRuleStyle, PrettyTable
 
+from piplicenses import __pkgname__
 from piplicenses.cli import create_output_string, create_parser, create_warn_string, get_output_fields, get_sortby
 from piplicenses.collector import get_packages
 from piplicenses.constants import DEFAULT_OUTPUT_FIELDS, SYSTEM_PACKAGES
@@ -144,7 +146,7 @@ class IntegrationTestCase(CommandLineTestCase):
         for row in table.rows:
             license_classifier.append(row[index_license_classifier])
 
-        for license_name in ("BSD", "MIT", "Apache 2.0"):
+        for license_name in ("BSD-3-Clause", "MIT", "Apache 2.0"):
             self.assertIn(license_name, license_meta)
         for license_name in (
             "BSD License",

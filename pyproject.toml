@@ -49,6 +49,7 @@ dev = [
     "twine",
     "tomli-w",
     "types-docutils",
+    "wheel",
 ]
 
 [project.urls]
@@ -78,7 +79,7 @@ known_first_party = ["piplicenses"]
 profile = "black"
 
 [tool.mypy]
-exclude = ["venv","build"]
+exclude = ["venv", "build"]
 mypy_path = [".", "stubs"]
 
 [tool.coverage.run]

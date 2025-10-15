@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: Copyright (c) 2018 raimon
 # SPDX-FileCopyrightText: Copyright (c) 2025 stefan6419846
+
 import re
 from contextlib import redirect_stderr
 from enum import Enum
@@ -35,7 +36,7 @@ class CreateOutputStringTestCase(CommandLineTestCase):
         output_string = create_output_string(args)
 
         self.assertIn("<table>", output_string)
-        self.assertIn("Filipe La&#237;ns", output_string)  # author of "build"
+        self.assertIn("Jukka Lehtosalo &lt;jukka.lehtosalo@iki.fi&gt;", output_string)  # author of "mypy"
 
     def test_format_json(self) -> None:
         format_json_args = ["--format=json", "--with-authors"]
@@ -79,7 +80,7 @@ class CreateOutputStringTestCase(CommandLineTestCase):
         format_plain_args = ["--format=plain-vertical", "--from=classifier"]
         args = self.parser.parse_args(format_plain_args)
         output_string = create_output_string(args)
-        self.assertIsNotNone(re.search(r"pytest\n\d\.\d\.\d\nMIT License\n", output_string), output_string)
+        self.assertIsNotNone(re.search(r"pep8-naming\n\d\.\d\.\d\nMIT License\n", output_string), output_string)
 
 
 class ParserTestCase(TestCase):
