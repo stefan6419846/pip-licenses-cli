@@ -36,12 +36,13 @@ jobs:
           mypy .
       - name: Test (SPDX support)
         run:
-          python -m coverage run -m unittest discover --verbose --start-directory tests
+          python -m coverage run --data-file=.coverage.spdx -m unittest discover --verbose --start-directory tests
       - name: Test (Default)
         run: |
           python -m pip uninstall license-expression -y
-          python -m coverage run -m unittest discover --verbose --start-directory tests
+          python -m coverage run --data-file=.coverage.no_spdx -m unittest discover --verbose --start-directory tests
       - name: Report coverage
         run: |
+          python -m coverage combine
           python -m coverage report --fail-under=100
         if: ${{ matrix.python != '3.9' }}

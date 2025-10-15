@@ -72,7 +72,7 @@ clean:
 full-clean:: local-uninstall clean
 	rm -vrf *.egg-info 2>/dev/null || : ;
 	rm -vfrd ./{piplicenses,tests}/__pycache__ 2>/dev/null || : ;
-	rm -vfrd ./.coverage 2>/dev/null || : ;
+	rm -vfrd ./.coverage* 2>/dev/null || : ;
 	rm -vfrd ./.mypy_cache 2>/dev/null || : ;
 
 .PHONY: un-setup
