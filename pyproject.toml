@@ -37,8 +37,8 @@ spdx = [
 ]
 dev = [
     "pip-licenses-cli[spdx]",
-    "autopep8",
     "black",
+    "coverage[toml]",
     "cryptography >= 45.0.3",
     "docutils",
     "flake8",
@@ -46,16 +46,9 @@ dev = [
     "isort",
     "mypy",
     "pep8-naming",
-    "pip-tools",
-    "pypandoc",
-    "pytest-cov",
     "twine",
     "tomli-w",
-    "types-colorama",
     "types-docutils",
-    "types-pexpect",
-    "types-pygments",
-    "wheel",
 ]
 
 [project.urls]
@@ -76,9 +69,6 @@ namespaces = false
 [tool.setuptools.dynamic]
 version = {attr = "piplicenses.__version__"}
 
-[tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report term-missing"
-
 [tool.black]
 line-length = 160
 
@@ -88,7 +78,7 @@ known_first_party = ["piplicenses"]
 profile = "black"
 
 [tool.mypy]
-exclude = ["venv"]
+exclude = ["venv","build"]
 mypy_path = [".", "stubs"]
 
 [tool.coverage.run]
