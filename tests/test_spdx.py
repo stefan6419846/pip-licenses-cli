@@ -53,7 +53,7 @@ class SpdxParserTestCase(TestCase):
             ("SPDX AND", "Apache-2.0 AND BSD-3-Clause"),
             ("SPDX OR", "Apache-2.0 OR BSD-3-Clause"),
             ("Invalid SPDX", "Hello World"),
-            ("Empty", "", {""}, False),
+            ("Empty", ""),
         ]:
             with self.subTest(test_id=test_id, expression=expression):
                 self.assertEqual({expression}, _get_spdx_parser()(expression))
