@@ -10,7 +10,7 @@ import sys
 from enum import Enum, auto
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Type, cast
+from typing import TYPE_CHECKING, cast
 
 from piplicenses_lib import FromArg, NoValueEnum
 
@@ -31,9 +31,9 @@ open = open  # To allow monkey-patching.
 
 
 class CustomNamespace(argparse.Namespace):
-    from_: "FromArg"
-    order: "OrderArg"
-    format_: "FormatArg"
+    from_: FromArg
+    order: OrderArg
+    format_: FormatArg
     summary: bool
     output_file: str
     ignore_packages: list[str]
@@ -48,8 +48,8 @@ class CustomNamespace(argparse.Namespace):
     filter_strings: bool
     filter_code_page: str
     partial_match: bool
-    fail_on: Optional[str]
-    allow_only: Optional[str]
+    fail_on: str | None
+    allow_only: str | None
     collect_all_failures: bool
 
 
@@ -138,10 +138,8 @@ def create_warn_string(args: CustomNamespace) -> str:
 
     if args.summary and (args.with_authors or args.with_urls):
         message = warn(
-            (
-                "When using this option, only --order=count or --order=license has an effect for the --order "
-                "option. And using --with-authors and --with-urls will be ignored."
-            )
+            "When using this option, only --order=count or --order=license has an effect for the --order "
+            "option. And using --with-authors and --with-urls will be ignored."
         )
         warn_messages.append(message)
 
@@ -154,7 +152,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):  # pragma: no cover
         prog: str,
         indent_increment: int = 2,
         max_help_position: int = 24,
-        width: Optional[int] = None,
+        width: int | None = None,
     ) -> None:
         max_help_position = 30
         super().__init__(
@@ -245,11 +243,11 @@ def enum_key_to_value(enum_key: Enum) -> str:
     return enum_key.name.replace("_", "-").lower()
 
 
-def choices_from_enum(enum_cls: Type[NoValueEnum]) -> list[str]:
+def choices_from_enum(enum_cls: type[NoValueEnum]) -> list[str]:
     return [key.replace("_", "-").lower() for key in enum_cls.__members__.keys()]
 
 
-def get_value_from_enum(enum_cls: Type[NoValueEnum], value: str) -> NoValueEnum:
+def get_value_from_enum(enum_cls: type[NoValueEnum], value: str) -> NoValueEnum:
     return getattr(enum_cls, value_to_enum_key(value))
 
 
@@ -266,7 +264,7 @@ class SelectAction(argparse.Action):
         parser: argparse.ArgumentParser,
         namespace: argparse.Namespace,
         values: str,
-        option_string: Optional[str] = None,
+        option_string: str | None = None,
     ) -> None:
         enum_cls = MAP_DEST_TO_ENUM[self.dest]
         setattr(namespace, self.dest, get_value_from_enum(enum_cls, values))

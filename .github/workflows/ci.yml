@@ -34,14 +34,15 @@ jobs:
       - name: Validate static typing with mypy
         run:
           mypy .
-      - name: Test with pytest (SPDX support)
+      - name: Test (SPDX support)
         run:
-          pytest -v --cov
-      - name: Test with pytest (Default)
+          python -m coverage run --data-file=.coverage.spdx -m unittest discover --verbose --start-directory tests
+      - name: Test (Default)
         run: |
           python -m pip uninstall license-expression -y
-          pytest -v --cov --cov-append
+          python -m coverage run --data-file=.coverage.no_spdx -m unittest discover --verbose --start-directory tests
       - name: Report coverage
         run: |
+          python -m coverage combine
           python -m coverage report --fail-under=100
         if: ${{ matrix.python != '3.9' }}
