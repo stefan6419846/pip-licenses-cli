@@ -80,7 +80,7 @@ class CreateOutputStringTestCase(CommandLineTestCase):
         format_plain_args = ["--format=plain-vertical", "--from=classifier"]
         args = self.parser.parse_args(format_plain_args)
         output_string = create_output_string(args)
-        self.assertIsNotNone(re.search(r"pep8-naming\n\d\.\d\.\d\nMIT License\n", output_string), output_string)
+        self.assertIsNotNone(re.search(r"pep8-naming\n\d+\.\d+\.\d+\nMIT License\n", output_string), output_string)
 
 
 class ParserTestCase(TestCase):
