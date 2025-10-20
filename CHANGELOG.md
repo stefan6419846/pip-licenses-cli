@@ -1,5 +1,7 @@
 # Development Version
 
+# Version 3.0.0 - 2025-10-20
+
 * Fix notice file headers being emitted after the actual notice text instead of before (like for the license texts).
 * Add support for the `License-File` field for specifying additional licensing-related files (PEP 639).
 * Add support for emitting multiple files in the JSON and *plain-vertical* mode.
