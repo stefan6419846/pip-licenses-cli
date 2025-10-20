@@ -6,7 +6,9 @@
 
 #### Option: python
 
-By default, this tools finds the packages from the environment pip-licenses-cli is launched from, by searching in current python's `sys.path` folders. In case you want to search for packages in another environment (e.g., if you want to run pip-licenses-cli from its own isolated environment), you can specify a path to a python executable. The packages will be searched for in the given python's `sys.path`, free of pip-licenses dependencies.
+By default, this tools finds the packages from the environment pip-licenses-cli is launched from, by searching in current python's `sys.path` folders.
+In case you want to search for packages in another environment (e.g., if you want to run pip-licenses-cli from its own isolated environment), you can
+specify a path to a python executable. The packages will be searched for in the given python's `sys.path`, free of pip-licenses dependencies.
 
 ```bash
 (venv) $ pip-licenses --with-system | grep pip
@@ -22,7 +24,8 @@ By default, this tools finds the packages from the environment pip-licenses-cli 
 
 #### Option: from
 
-By default, this tool finds the license from [Trove Classifiers](https://pypi.org/classifiers/) or package Metadata. Some Python packages declare their license only in Trove Classifiers.
+By default, this tool finds the license from [Trove Classifiers](https://pypi.org/classifiers/) or package Metadata. Some Python packages declare their license only in
+Trove Classifiers.
 
 (See also): [Set license to MIT in setup.py by alisianoi ・ Pull Request #1058 ・ pypa/setuptools](https://github.com/pypa/setuptools/pull/1058), [PEP 314\#License](https://www.python.org/dev/peps/pep-0314/#license)
 
@@ -46,7 +49,8 @@ The mixed mode (`--from=mixed`) of this tool works well and looks for licenses.
  setuptools    38.5.0   MIT License
 ```
 
-In mixed mode, it first tries to look for licenses in the Trove Classifiers. When not found in the Trove Classifiers, the license declared in Metadata is displayed.
+In mixed mode, it first tries to look for licenses in the Trove Classifiers. When not found in the Trove Classifiers, the license declared in Metadata
+is displayed.
 
 If you want to look only in metadata, use `--from=meta`. If you want to look only in Trove Classifiers, use `--from=classifier`.
 
@@ -94,7 +98,8 @@ When inserted in a Markdown document, it is rendered as follows:
 
 ##### reST
 
-When executed with the `--format=rst` option, you can output list in "[Grid tables](http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#grid-tables)" of reStructuredText format. The `r` `rest` keyword is prepared as alias of `rst`.
+When executed with the `--format=rst` option, you can output list in "[Grid tables](http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#grid-tables)" of reStructuredText format. The `r` `rest` keyword is
+prepared as alias of `rst`.
 
 ```bash
 (venv) $ pip-licenses --format=rst
@@ -109,7 +114,8 @@ When executed with the `--format=rst` option, you can output list in "[Grid tabl
 
 ##### Confluence
 
-When executed with the `--format=confluence` option, you can output list in [Confluence (or JIRA) Wiki markup](https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html#ConfluenceWikiMarkup-Tables) format. The `c` keyword is prepared as alias of `confluence`.
+When executed with the `--format=confluence` option, you can output list in [Confluence (or JIRA) Wiki markup](https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html#ConfluenceWikiMarkup-Tables) format. The `c` keyword is
+prepared as alias of `confluence`.
 
 ```bash
 (venv) $ pip-licenses --format=confluence
@@ -145,7 +151,8 @@ When executed with the `--format=html` option, you can output list in HTML table
 
 ##### JSON
 
-When executed with the `--format=json` option, you can output list in JSON format easily allowing post-processing. The `j` keyword is prepared as alias of `json`.
+When executed with the `--format=json` option, you can output list in JSON format easily allowing post-processing. The `j` keyword is prepared
+as alias of `json`.
 
 ```json
 [
@@ -168,7 +175,8 @@ When executed with the `--format=json` option, you can output list in JSON forma
 
 ##### JSON LicenseFinder
 
-When executed with the `--format=json-license-finder` option, you can output list in JSON format that is identical to [LicenseFinder](https://github.com/pivotal/LicenseFinder). The `jlf` keyword is prepared as alias of `jlf`.
+When executed with the `--format=json-license-finder` option, you can output list in JSON format that is identical to [LicenseFinder](https://github.com/pivotal/LicenseFinder).
+The `jlf` keyword is prepared as alias of `jlf`.
 This makes pip-licenses-cli a drop-in replacement for LicenseFinder.
 
 ```json
@@ -242,7 +250,8 @@ When executed with the `--summary` option, you can output a summary of each lice
  4      MIT License
 ```
 
-**Note:** When using this option, only `--order=count` or `--order=license` has an effect for the `--order` option. And using `--with-authors` and `--with-urls` will be ignored.
+**Note:** When using this option, only `--order=count` or `--order=license` has an effect for the `--order` option. And using `--with-authors`
+and `--with-urls` will be ignored.
 
 #### Option: output\-file
 
@@ -378,19 +387,29 @@ When executed with the `--no-version` option, output without the version number.
 
 #### Option: with-license-file
 
-When executed with the `--with-license-file` option, output the location of the package's license file on disk and the full contents of that file. Due to the length of these fields, this option is best paired with `--format=json`.
+When executed with the `--with-license-file` option, output the location of the package's license file on disk and the full contents of that file.
+Due to the length of these fields, this option is best paired with `--format=json`.
 
-If you also want to output the file `NOTICE` distributed under Apache License etc., specify the `--with-notice-file` option additionally.
+If you also want to output the file `NOTICE` distributed under Apache License etc., specify the `--with-notice-file` option as well.
 
-**Note:** If you want to keep the license file path secret, specify `--no-license-path` option together.
+To emit all files in JSON and *plain-vertical* mode (instead of just the first one), use the following parameters:
+
+  * `--with-license-files` emits all license files.
+  * `--with-notice-files` emits all notice files.
+  * `--with-other-files` emits all other licensing-related files not captured by the aforementioned groups, for example AUTHORS files.
+
+**Note:** If you want to keep the corresponding file paths secret, specify `--no-license-path` option as well.
 
 #### Option: filter\-strings
 
-Some package data contains Unicode characters which might cause problems for certain output formats (in particular ReST tables). If this filter is enabled, all characters that cannot be encoded with a given code page (see `--filter-code-page`) will be removed from any input strings (e.g., package name, description).
+Some package data contains Unicode characters which might cause problems for certain output formats (in particular ReST tables). If this filter
+is enabled, all characters that cannot be encoded with a given code page (see `--filter-code-page`) will be removed from any input strings (e.g.,
+package name, description).
 
 #### Option: filter\-code\-page
 
-If the input strings are filtered (see `--filter-strings`), you can specify the applied code page (default `latin-1`). A list of all available code pages can be found [codecs module document](https://docs.python.org/3/library/codecs.html#standard-encodings).
+If the input strings are filtered (see `--filter-strings`), you can specify the applied code page (default `latin-1`). A list of all available
+code pages can be found [codecs module document](https://docs.python.org/3/library/codecs.html#standard-encodings).
 
 
 ### Verify options
@@ -517,7 +536,8 @@ fail-on = "MIT;"
 ```
 
 If you run `pip-licenses` without any command-line options, all options will be taken from the `pyproject.toml` file. 
-For instance, if you run `pip-licenses --from=mixed`, the `from` option will be overridden to `mixed`, while all other options will be sourced from `pyproject.toml`.
+For instance, if you run `pip-licenses --from=mixed`, the `from` option will be overridden to `mixed`, while all other options will be sourced from
+`pyproject.toml`.
 
 ### More Information
 

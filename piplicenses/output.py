@@ -11,14 +11,20 @@ from piplicenses_lib import LICENSE_UNKNOWN
 from prettytable import HRuleStyle, PrettyTable
 
 from piplicenses.collector import get_packages
-from piplicenses.constants import DEFAULT_OUTPUT_FIELDS, FIELDS_TO_METADATA_KEYS, SUMMARY_FIELD_NAMES
+from piplicenses.constants import _MULTI_VALUE_KEYS, DEFAULT_OUTPUT_FIELDS, FIELDS_TO_METADATA_KEYS, SUMMARY_FIELD_NAMES
 
 if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Sequence
+    from collections.abc import Iterator, Sequence
 
     from prettytable import RowType
 
     from piplicenses.cli import CustomNamespace
+
+
+def _handle_multiple_value_field(key: str, value: Iterator[str]) -> str | list[str]:
+    if key.endswith("s"):
+        return list(value) or ["UNKNOWN"]
+    return cast(str, next(value, LICENSE_UNKNOWN))
 
 
 def create_licenses_table(
@@ -28,7 +34,7 @@ def create_licenses_table(
     table = factory_styled_table_with_args(args, output_fields)
 
     for pkg in get_packages(args):
-        row = []
+        row: list[str | list[str]] = []
         for field in output_fields:
             if field == "License":
                 license_set = pkg.license_names
@@ -40,13 +46,8 @@ def create_licenses_table(
                 row.append(cast(str, getattr(pkg, field.lower())))
             else:
                 value = getattr(pkg, FIELDS_TO_METADATA_KEYS[field])
-                if field in {
-                    "LicenseFile",
-                    "LicenseText",
-                    "NoticeFile",
-                    "NoticeText",
-                }:
-                    row.append(cast(str, next(value, LICENSE_UNKNOWN)))
+                if field in _MULTI_VALUE_KEYS:
+                    row.append(_handle_multiple_value_field(field, value))
                 else:
                     row.append(cast(str, value))
         table.add_row(row)
@@ -149,11 +150,24 @@ class PlainVerticalTable(PrettyTable):
     def get_string(self, **kwargs: str | list[str]) -> str:
         options = self._get_options(kwargs)
         rows = self._get_rows(options)
+        show_paths = "LicenseFiles" in kwargs["fields"]
 
         output = ""
         for row in rows:
-            for v in row:
-                output += "{}\n".format(v)
+            index = 0
+            while index < len(row):
+                v = row[index]
+                if isinstance(v, list):
+                    if show_paths:
+                        for first_entry, second_entry in zip(v, row[index + 1]):
+                            output += "{}\n{}\n".format(first_entry, second_entry)
+                        index += 1
+                    else:
+                        for entry in v:
+                            output += "{}\n".format(entry)
+                else:
+                    output += "{}\n".format(v)
+                index += 1
             output += "\n"
 
         return output

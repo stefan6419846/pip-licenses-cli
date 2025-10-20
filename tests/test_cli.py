@@ -19,6 +19,7 @@ from piplicenses.cli import (
     create_parser,
     create_warn_string,
     enum_key_to_value,
+    get_output_fields,
     get_sortby,
     load_config_from_file,
     output_colored,
@@ -264,6 +265,15 @@ class CreateWarnStringTestCase(CommandLineTestCase):
             warn_string,
         )
 
+    def test_with_license_files_format_warning(self) -> None:
+        args = self.parser.parse_args(["--format=html", "--with-license-files"])
+        warn_string = create_warn_string(args)
+        self.assertIn("Ignoring request to output multiple files due to unsupported output format.", warn_string)
+
+        args = self.parser.parse_args(["--format=json", "--with-license-files"])
+        warn_string = create_warn_string(args)
+        self.assertNotIn("Ignoring request to output multiple files due to unsupported output format.", warn_string)
+
 
 class GetSortbyTestCase(CommandLineTestCase):
     def test_summary_sort_by_count(self) -> None:
@@ -321,3 +331,67 @@ class GetSortbyTestCase(CommandLineTestCase):
 
         sortby = get_sortby(args)
         self.assertEqual("Name", sortby)
+
+
+class GetOutputFieldsTestCase(CommandLineTestCase):
+    def test_with_license_files(self) -> None:
+        for format_string in ["json", "plain-vertical"]:
+            with self.subTest(format_string=format_string):
+                args = self.parser.parse_args(["--with-license-files", f"--format={format_string}", "--with-notice-files", "--with-other-files"])
+                fields = get_output_fields(args)
+                self.assertEqual(
+                    ["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields
+                )
+
+        for format_string in ["plain", "csv", "html"]:
+            with self.subTest(format_string=format_string):
+                args = self.parser.parse_args(["--with-license-files", f"--format={format_string}", "--with-notice-files", "--with-other-files"])
+                fields = get_output_fields(args)
+                self.assertEqual(["Name", "Version", "License"], fields)
+
+    def test_files_singular_plural(self) -> None:
+        args = self.parser.parse_args(
+            [
+                "--with-license-file",
+                "--format=json",
+                "--with-notice-file",
+                "--with-other-files",
+            ]
+        )
+        fields = get_output_fields(args)
+        self.assertEqual(["Name", "Version", "License", "LicenseFile", "LicenseText", "NoticeFile", "NoticeText", "OtherFiles", "OtherTexts"], fields)
+
+        args = self.parser.parse_args(
+            [
+                "--with-license-files",
+                "--format=json",
+                "--with-notice-files",
+                "--with-other-files",
+            ]
+        )
+        fields = get_output_fields(args)
+        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields)
+
+    def test_no_license_path(self) -> None:
+        args = self.parser.parse_args(
+            [
+                "--with-license-files",
+                "--format=json",
+                "--with-notice-files",
+                "--with-other-files",
+            ]
+        )
+        fields = get_output_fields(args)
+        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields)
+
+        args = self.parser.parse_args(
+            [
+                "--with-license-files",
+                "--format=json",
+                "--with-notice-files",
+                "--with-other-files",
+                "--no-license-path",
+            ]
+        )
+        fields = get_output_fields(args)
+        self.assertEqual(["Name", "Version", "License", "LicenseTexts", "NoticeTexts", "OtherTexts"], fields)

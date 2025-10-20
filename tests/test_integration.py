@@ -3,14 +3,15 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025 stefan6419846
 
 import copy
+import json
 import sys
 import venv
-from importlib.metadata import Distribution
+from importlib.metadata import Distribution, PathDistribution
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest import mock
 
-from piplicenses_lib import normalize_package_name
+from piplicenses_lib import PackageInfo, normalize_package_name
 from prettytable import HRuleStyle, PrettyTable
 
 from piplicenses import __pkgname__
@@ -508,3 +509,132 @@ class IntegrationTestCase(CommandLineTestCase):
                 self.assertEqual("", captured.stderr)
             else:
                 self.assertEqual(f"fail-on license {expression} was found for package cryptography:{CRYPTOGRAPHY_VERSION}\n", captured.stderr)
+
+    def test_file_handling(self) -> None:
+        package = PackageInfo(
+            name="test-package",
+            version="1.0",
+            distribution=PathDistribution.from_name("pip-licenses-lib"),
+            licenses=[
+                ("/django/contrib/admin/static/admin/css/vendor/select2/LICENSE-SELECT2.md", "This is the SELECT2 license text."),
+                ("/django-5.2.6.dist-info/licenses/LICENSE", "This is the primary license text."),
+                ("/django-5.2.6.dist-info/licenses/LICENSE.python", "This is the license for upstream Python."),
+            ],
+            notices=[
+                ("/django-5.2.6.dist-info/licenses/NOTICE1", "This is the first notice file."),
+                ("/django-5.2.6.dist-info/licenses/NOTICE2", "This is the second notice file."),
+            ],
+            others=[
+                ("/django-5.2.6.dist-info/licenses/AUTHORS", "This is the AUTHORS file."),
+                ("/django-5.2.6.dist-info/licenses/TESTING", "This is a dummy file for testing."),
+            ],
+        )
+
+        with mock.patch("piplicenses.collector._get_packages", return_value=[package]):
+            args = create_parser().parse_args(["--format=plain-vertical"])
+            result = create_output_string(args)
+            self.assertEqual("test-package\n1.0\n\n\n", result)
+
+            args = create_parser().parse_args(["--format=plain-vertical", "--with-license-file", "--with-notice-file"])
+            result = create_output_string(args)
+            self.assertEqual(
+                """test-package
+1.0
+
+/django/contrib/admin/static/admin/css/vendor/select2/LICENSE-SELECT2.md
+This is the SELECT2 license text.
+/django-5.2.6.dist-info/licenses/NOTICE1
+This is the first notice file.
+
+""",
+                result,
+            )
+
+            args = create_parser().parse_args(["--format=plain-vertical", "--with-license-files", "--with-notice-files", "--with-other-files"])
+            result = create_output_string(args)
+            self.assertEqual(
+                """test-package
+1.0
+
+/django/contrib/admin/static/admin/css/vendor/select2/LICENSE-SELECT2.md
+This is the SELECT2 license text.
+/django-5.2.6.dist-info/licenses/LICENSE
+This is the primary license text.
+/django-5.2.6.dist-info/licenses/LICENSE.python
+This is the license for upstream Python.
+/django-5.2.6.dist-info/licenses/NOTICE1
+This is the first notice file.
+/django-5.2.6.dist-info/licenses/NOTICE2
+This is the second notice file.
+/django-5.2.6.dist-info/licenses/AUTHORS
+This is the AUTHORS file.
+/django-5.2.6.dist-info/licenses/TESTING
+This is a dummy file for testing.
+
+""",
+                result,
+            )
+
+            args = create_parser().parse_args(
+                ["--format=plain-vertical", "--with-license-files", "--with-notice-files", "--with-other-files", "--no-license-path"]
+            )
+            result = create_output_string(args)
+            self.assertEqual(
+                """test-package
+1.0
+
+This is the SELECT2 license text.
+This is the primary license text.
+This is the license for upstream Python.
+This is the first notice file.
+This is the second notice file.
+This is the AUTHORS file.
+This is a dummy file for testing.
+
+""",
+                result,
+            )
+
+            args = create_parser().parse_args(["--format=json"])
+            result = create_output_string(args)
+            self.assertEqual([{"License": "", "Name": "test-package", "Version": "1.0"}], json.loads(result))
+
+            args = create_parser().parse_args(["--format=json", "--with-license-file", "--with-notice-file"])
+            result = create_output_string(args)
+            self.assertEqual(
+                [
+                    {
+                        "License": "",
+                        "LicenseFile": "/django/contrib/admin/static/admin/css/vendor/select2/LICENSE-SELECT2.md",
+                        "LicenseText": "This is the SELECT2 license text.",
+                        "Name": "test-package",
+                        "NoticeFile": "/django-5.2.6.dist-info/licenses/NOTICE1",
+                        "NoticeText": "This is the first notice file.",
+                        "Version": "1.0",
+                    }
+                ],
+                json.loads(result),
+            )
+
+            args = create_parser().parse_args(["--format=json", "--with-license-files", "--with-notice-files", "--with-other-files"])
+            result = create_output_string(args)
+            self.assertEqual(
+                [
+                    {
+                        "License": "",
+                        "LicenseFiles": [
+                            "/django/contrib/admin/static/admin/css/vendor/select2/LICENSE-SELECT2.md",
+                            "/django-5.2.6.dist-info/licenses/LICENSE",
+                            "/django-5.2.6.dist-info/licenses/LICENSE.python",
+                        ],
+                        "LicenseTexts": ["This is the SELECT2 license text.", "This is the primary license text.", "This is the license for upstream Python."],
+                        "Name": "test-package",
+                        "NoticeFiles": ["/django-5.2.6.dist-info/licenses/NOTICE1", "/django-5.2.6.dist-info/licenses/NOTICE2"],
+                        "NoticeTexts": ["This is the first notice file.", "This is the second notice file."],
+                        "OtherFiles": ["/django-5.2.6.dist-info/licenses/AUTHORS", "/django-5.2.6.dist-info/licenses/TESTING"],
+                        "OtherTexts": ["This is the AUTHORS file.", "This is a dummy file for testing."],
+                        "Version": "1.0",
+                    }
+                ],
+                json.loads(result),
+            )

@@ -44,10 +44,29 @@ FIELDS_TO_METADATA_KEYS = {
     "License-Metadata": "license",
     "License-Classifier": "license_classifier",
     "LicenseFile": "license_files",
+    "LicenseFiles": "license_files",
     "LicenseText": "license_texts",
+    "LicenseTexts": "license_texts",
     "NoticeFile": "notice_files",
+    "NoticeFiles": "notice_files",
     "NoticeText": "notice_texts",
+    "NoticeTexts": "notice_texts",
+    "OtherFiles": "other_files",
+    "OtherTexts": "other_texts",
     "Description": "summary",
+}
+
+_MULTI_VALUE_KEYS = {
+    "LicenseFile",
+    "LicenseFiles",
+    "LicenseText",
+    "LicenseTexts",
+    "NoticeFile",
+    "NoticeFiles",
+    "NoticeText",
+    "NoticeTexts",
+    "OtherFiles",
+    "OtherTexts",
 }
 
 
