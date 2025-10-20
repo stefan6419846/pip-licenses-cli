@@ -1,5 +1,7 @@
 # Development Version
 
+* Add support for the `License-File` field for specifying additional licensing-related files (PEP 639).
+* Add support for emitting multiple files in the JSON and *plain-vertical* mode.
 * Drop support for Python 3.9.
 * Migrate tests to plain *unittest* functionality.
 
