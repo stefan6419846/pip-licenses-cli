@@ -340,7 +340,7 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
                 args = self.parser.parse_args(["--with-license-files", f"--format={format_string}", "--with-notice-files", "--with-other-files"])
                 fields = get_output_fields(args)
                 self.assertEqual(
-                    ["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeTexts", "NoticeFiles", "OtherTexts", "OtherFiles"], fields
+                    ["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields
                 )
 
         for format_string in ["plain", "csv", "html"]:
@@ -359,7 +359,7 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
             ]
         )
         fields = get_output_fields(args)
-        self.assertEqual(["Name", "Version", "License", "LicenseFile", "LicenseText", "NoticeText", "NoticeFile", "OtherTexts", "OtherFiles"], fields)
+        self.assertEqual(["Name", "Version", "License", "LicenseFile", "LicenseText", "NoticeFile", "NoticeText", "OtherFiles", "OtherTexts"], fields)
 
         args = self.parser.parse_args(
             [
@@ -370,7 +370,7 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
             ]
         )
         fields = get_output_fields(args)
-        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeTexts", "NoticeFiles", "OtherTexts", "OtherFiles"], fields)
+        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields)
 
     def test_no_license_path(self) -> None:
         args = self.parser.parse_args(
@@ -382,7 +382,7 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
             ]
         )
         fields = get_output_fields(args)
-        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeTexts", "NoticeFiles", "OtherTexts", "OtherFiles"], fields)
+        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields)
 
         args = self.parser.parse_args(
             [

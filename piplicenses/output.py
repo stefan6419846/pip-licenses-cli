@@ -150,6 +150,7 @@ class PlainVerticalTable(PrettyTable):
     def get_string(self, **kwargs: str | list[str]) -> str:
         options = self._get_options(kwargs)
         rows = self._get_rows(options)
+        show_paths = "LicenseFiles" in kwargs["fields"]
 
         output = ""
         for row in rows:
@@ -157,9 +158,13 @@ class PlainVerticalTable(PrettyTable):
             while index < len(row):
                 v = row[index]
                 if isinstance(v, list):
-                    for first_entry, second_entry in zip(v, row[index + 1]):
-                        output += "{}\n{}\n".format(first_entry, second_entry)
-                    index += 1
+                    if show_paths:
+                        for first_entry, second_entry in zip(v, row[index + 1]):
+                            output += "{}\n{}\n".format(first_entry, second_entry)
+                        index += 1
+                    else:
+                        for entry in v:
+                            output += "{}\n".format(entry)
                 else:
                     output += "{}\n".format(v)
                 index += 1

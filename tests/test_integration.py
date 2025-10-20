@@ -522,7 +522,7 @@ class IntegrationTestCase(CommandLineTestCase):
             ],
             notices=[
                 ("/django-5.2.6.dist-info/licenses/NOTICE1", "This is the first notice file."),
-                ("/django-5.2.6.dist-info/licenses/NOTICE1", "This is the second notice file."),
+                ("/django-5.2.6.dist-info/licenses/NOTICE2", "This is the second notice file."),
             ],
             others=[
                 ("/django-5.2.6.dist-info/licenses/AUTHORS", "This is the AUTHORS file."),
@@ -543,8 +543,8 @@ class IntegrationTestCase(CommandLineTestCase):
 
 /django/contrib/admin/static/admin/css/vendor/select2/LICENSE-SELECT2.md
 This is the SELECT2 license text.
-This is the first notice file.
 /django-5.2.6.dist-info/licenses/NOTICE1
+This is the first notice file.
 
 """,
                 result,
@@ -562,14 +562,34 @@ This is the SELECT2 license text.
 This is the primary license text.
 /django-5.2.6.dist-info/licenses/LICENSE.python
 This is the license for upstream Python.
+/django-5.2.6.dist-info/licenses/NOTICE1
 This is the first notice file.
-/django-5.2.6.dist-info/licenses/NOTICE1
+/django-5.2.6.dist-info/licenses/NOTICE2
 This is the second notice file.
-/django-5.2.6.dist-info/licenses/NOTICE1
-This is the AUTHORS file.
 /django-5.2.6.dist-info/licenses/AUTHORS
-This is a dummy file for testing.
+This is the AUTHORS file.
 /django-5.2.6.dist-info/licenses/TESTING
+This is a dummy file for testing.
+
+""",
+                result,
+            )
+
+            args = create_parser().parse_args(
+                ["--format=plain-vertical", "--with-license-files", "--with-notice-files", "--with-other-files", "--no-license-path"]
+            )
+            result = create_output_string(args)
+            self.assertEqual(
+                """test-package
+1.0
+
+This is the SELECT2 license text.
+This is the primary license text.
+This is the license for upstream Python.
+This is the first notice file.
+This is the second notice file.
+This is the AUTHORS file.
+This is a dummy file for testing.
 
 """,
                 result,
@@ -609,7 +629,7 @@ This is a dummy file for testing.
                         ],
                         "LicenseTexts": ["This is the SELECT2 license text.", "This is the primary license text.", "This is the license for upstream Python."],
                         "Name": "test-package",
-                        "NoticeFiles": ["/django-5.2.6.dist-info/licenses/NOTICE1", "/django-5.2.6.dist-info/licenses/NOTICE1"],
+                        "NoticeFiles": ["/django-5.2.6.dist-info/licenses/NOTICE1", "/django-5.2.6.dist-info/licenses/NOTICE2"],
                         "NoticeTexts": ["This is the first notice file.", "This is the second notice file."],
                         "OtherFiles": ["/django-5.2.6.dist-info/licenses/AUTHORS", "/django-5.2.6.dist-info/licenses/TESTING"],
                         "OtherTexts": ["This is the AUTHORS file.", "This is a dummy file for testing."],

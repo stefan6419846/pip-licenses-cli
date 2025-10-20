@@ -95,13 +95,13 @@ def get_output_fields(args: CustomNamespace) -> list[str]:
         output_fields.append("LicenseTexts" if args.with_license_files else "LicenseText")
 
         if args.with_notice_file or args.with_notice_files:
-            output_fields.append("NoticeTexts" if args.with_notice_files else "NoticeText")
             if not args.no_license_path:
                 output_fields.append("NoticeFiles" if args.with_notice_files else "NoticeFile")
+            output_fields.append("NoticeTexts" if args.with_notice_files else "NoticeText")
         if args.with_other_files:
-            output_fields.append("OtherTexts")
             if not args.no_license_path:
                 output_fields.append("OtherFiles")
+            output_fields.append("OtherTexts")
 
     return output_fields
 
