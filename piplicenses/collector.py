@@ -37,16 +37,20 @@ def parse_licenses_list(licenses_str: str | None) -> list[str]:
     return licenses
 
 
+def _should_include_files(args: CustomNamespace) -> bool:
+    return args.with_license_file or args.with_license_files or args.with_notice_file or args.with_notice_files or args.with_other_files
+
+
 def get_packages(
     args: CustomNamespace,
 ) -> Iterator[PackageInfo]:
-    ignore_pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.ignore_packages]
-    pkgs_as_normalize = [normalize_package_name(pkg) for pkg in args.packages]
+    ignore_pkgs_as_normalize = list(map(normalize_package_name, args.ignore_packages))
+    pkgs_as_normalize = list(map(normalize_package_name, args.packages))
 
     fail_on_licenses = set(parse_licenses_list(args.fail_on))
     allow_only_licenses = set(parse_licenses_list(args.allow_only))
 
-    include_files = args.with_license_file or args.with_notice_file
+    include_files = _should_include_files(args)
     failures = []
     for pkg_info in _get_packages(
         from_source=args.from_,

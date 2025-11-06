@@ -1,5 +1,7 @@
 # Development Version
 
+* Fix missing file retrieval for some option combinations.
+
 # Version 3.0.0 - 2025-10-20
 
 * Fix notice file headers being emitted after the actual notice text instead of before (like for the license texts).

@@ -4,7 +4,9 @@
 
 from unittest import TestCase
 
+from piplicenses.cli import CustomNamespace
 from piplicenses.collector import (
+    _should_include_files,
     case_insensitive_partial_match_set_diff,
     case_insensitive_partial_match_set_intersect,
     case_insensitive_set_diff,
@@ -12,7 +14,31 @@ from piplicenses.collector import (
     get_packages,
     parse_licenses_list,
 )
-from tests import UNICODE_APPENDIX, PatchDistributionsTestCase
+from tests import UNICODE_APPENDIX, CommandLineTestCase, PatchDistributionsTestCase
+
+
+class ShouldIncludeFilesTestCase(CommandLineTestCase):
+    KEYS = ["with_license_file", "with_license_files", "with_notice_file", "with_notice_files", "with_other_files"]
+
+    def test_none_requested(self) -> None:
+        args = CustomNamespace(**{key: False for key in self.KEYS})
+        self.assertFalse(_should_include_files(args))
+
+    def test_one_requested(self) -> None:
+        args = CustomNamespace()
+
+        def set_keys(_enabled: str) -> None:
+            for _key in self.KEYS:
+                setattr(args, _key, _key == _enabled)
+
+        for name in self.KEYS:
+            with self.subTest(name=name):
+                set_keys(name)
+                self.assertTrue(_should_include_files(args))
+
+    def test_multiple_requested(self) -> None:
+        args = CustomNamespace(**{key: key.endswith("s") for key in self.KEYS})
+        self.assertTrue(_should_include_files(args))
 
 
 class GetPackagesTestCase(PatchDistributionsTestCase):
