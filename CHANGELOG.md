@@ -1,5 +1,7 @@
 # Development Version
 
+# Version 3.0.1 - 2025-11-06
+
 * Fix missing file retrieval for some option combinations.
 
 # Version 3.0.0 - 2025-10-20
