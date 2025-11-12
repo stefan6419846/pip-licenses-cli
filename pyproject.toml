@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "pip-licenses-cli"
 description = "Dump the software license list of Python packages installed with pip."
 dynamic = ["version"]
-requires-python = ">=3.9, <4"
+requires-python = ">=3.10, <4"
 license = "MIT"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
