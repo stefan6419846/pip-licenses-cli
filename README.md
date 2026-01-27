@@ -66,7 +66,8 @@ See useful reports:
 
 * [pip-licenses-lib](https://pypi.org/project/pip-licenses-lib/) by the same authors as the CLI (MIT License).
 * [prettytable](https://pypi.org/project/prettytable/) by Luke Maurits, subject to the BSD-3-Clause License.
-    * **Note:** This package implicitly requires [wcwidth](https://pypi.org/project/wcwidth/) by Jeff Quast (MIT License).
+    * **Note:** This package implicitly requires [wcwidth](https://pypi.org/project/wcwidth/) by Jeff Quast (MIT License),
+      which itself contains data derived from the Unicode standard (Unicode-3.0 License).
 * For Python < 3.11: [tomli](https://pypi.org/project/tomli/) by Taneli Hukkinen under the MIT License.
 
 If you are using SPDX support with the `spdx` extra, the following additional dependencies are required:
