@@ -397,6 +397,7 @@ To emit all files in JSON and *plain-vertical* mode (instead of just the first o
   * `--with-license-files` emits all license files.
   * `--with-notice-files` emits all notice files.
   * `--with-other-files` emits all other licensing-related files not captured by the aforementioned groups, for example AUTHORS files.
+  * `--with-sbom-files` emits all SBOM files (PEP 770).
 
 **Note:** If you want to keep the corresponding file paths secret, specify `--no-license-path` option as well.
 
