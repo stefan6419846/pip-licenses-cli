@@ -23,7 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 def _handle_multiple_value_field(key: str, value: Iterator[str]) -> str | list[str]:
     if key.endswith("s"):
-        return list(value) or [LICENSE_UNKNOWN]
+        return list(value)
     return cast(str, next(value, LICENSE_UNKNOWN))
 
 

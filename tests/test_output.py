@@ -7,7 +7,9 @@ from docutils.parsers.rst import Parser
 from docutils.utils import new_document
 from prettytable import HRuleStyle
 
-from piplicenses.output import create_licenses_table, factory_styled_table_with_args
+from piplicenses_lib import LICENSE_UNKNOWN
+
+from piplicenses.output import _handle_multiple_value_field, create_licenses_table, factory_styled_table_with_args
 from tests import PatchDistributionsTestCase
 
 
@@ -79,3 +81,12 @@ class FactoryStyledTableWithArgsTestCase(PatchDistributionsTestCase):
         self.assertTrue(table.header)
         self.assertEqual("+", table.junction_char)
         self.assertEqual(HRuleStyle.FRAME, table.hrules)
+
+
+class HandleMultipleValueFieldTestCase(PatchDistributionsTestCase):
+    def test_handle(self) -> None:
+        self.assertEqual([], _handle_multiple_value_field("LicenseFiles", iter([])))
+        self.assertEqual(["path1", "path2"], _handle_multiple_value_field("LicenseFiles", iter(["path1", "path2"])))
+
+        self.assertEqual(LICENSE_UNKNOWN, _handle_multiple_value_field("LicenseFile", iter([])))
+        self.assertEqual("path1", _handle_multiple_value_field("LicenseFile", iter(["path1", "path2"])))
