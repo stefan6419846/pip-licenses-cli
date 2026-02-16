@@ -1,5 +1,7 @@
 # Development Version
 
+# Version 4.0.0 - 2026-02-16
+
 * Add support for retrieving SBOM files (PEP 770).
 * Avoid emitting `UNKNOWN` for empty lists (like missing license or notice files).
 
