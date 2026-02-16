@@ -1,5 +1,7 @@
 # Development Version
 
+* Add support for retrieving SBOM files (PEP 770).
+
 # Version 3.0.1 - 2025-11-06
 
 * Fix missing file retrieval for some option combinations.

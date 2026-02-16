@@ -18,7 +18,7 @@ from tests import UNICODE_APPENDIX, CommandLineTestCase, PatchDistributionsTestC
 
 
 class ShouldIncludeFilesTestCase(CommandLineTestCase):
-    KEYS = ["with_license_file", "with_license_files", "with_notice_file", "with_notice_files", "with_other_files"]
+    KEYS = ["with_license_file", "with_license_files", "with_notice_file", "with_notice_files", "with_other_files", "with_sbom_files"]
 
     def test_none_requested(self) -> None:
         args = CustomNamespace(**{key: False for key in self.KEYS})

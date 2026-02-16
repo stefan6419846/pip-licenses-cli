@@ -48,6 +48,7 @@ class CustomNamespace(argparse.Namespace):
     with_notice_file: bool
     with_notice_files: bool
     with_other_files: bool
+    with_sbom_files: bool
     filter_strings: bool
     filter_code_page: str
     partial_match: bool
@@ -87,21 +88,27 @@ def get_output_fields(args: CustomNamespace) -> list[str]:
         args.with_license_files = False
         args.with_notice_files = False
         args.with_other_files = False
+        args.with_sbom_files = False
 
     if args.with_license_file or args.with_license_files:
         if not args.no_license_path:
             output_fields.append("LicenseFiles" if args.with_license_files else "LicenseFile")
-
         output_fields.append("LicenseTexts" if args.with_license_files else "LicenseText")
 
         if args.with_notice_file or args.with_notice_files:
             if not args.no_license_path:
                 output_fields.append("NoticeFiles" if args.with_notice_files else "NoticeFile")
             output_fields.append("NoticeTexts" if args.with_notice_files else "NoticeText")
+
         if args.with_other_files:
             if not args.no_license_path:
                 output_fields.append("OtherFiles")
             output_fields.append("OtherTexts")
+
+        if args.with_sbom_files:
+            if not args.no_license_path:
+                output_fields.append("SbomFiles")
+            output_fields.append("SbomTexts")
 
     return output_fields
 
@@ -220,7 +227,8 @@ class CompatibleArgumentParser(argparse.ArgumentParser):
         if args.with_license_file is False and args.with_license_files is False:
             if args.no_license_path is True or args.with_notice_file is True or args.with_notice_files is True or args.with_other_files is True:
                 self.error(
-                    "'--no-license-path' and '--with-notice-file[s]' as well as '--with-other-files' require the '--with-license-file[s]' option to be set"
+                    "'--no-license-path' and '--with-notice-file[s]' as well as '--with-other-files' and '--with-sbom-files' require the"
+                    "'--with-license-file[s]' option to be set"
                 )
         if args.filter_strings is False and args.filter_code_page != "latin1":
             self.error("'--filter-code-page' requires the '--filter-strings' option to be set")
@@ -470,6 +478,12 @@ def create_parser(
         action="store_true",
         default=config_from_file.get("with-other-files", False),
         help="I|when specified together with option -l or --with-license-files, dump with location of other licensing-related files and contents",
+    )
+    format_options.add_argument(
+        "--with-sbom-files",
+        action="store_true",
+        default=config_from_file.get("with-sbom-files", False),
+        help="I|when specified together with option -l or --with-license-files, dump with location of SBOM files and contents",
     )
     format_options.add_argument(
         "--filter-strings",

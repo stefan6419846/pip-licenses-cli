@@ -337,15 +337,44 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
     def test_with_license_files(self) -> None:
         for format_string in ["json", "plain-vertical"]:
             with self.subTest(format_string=format_string):
-                args = self.parser.parse_args(["--with-license-files", f"--format={format_string}", "--with-notice-files", "--with-other-files"])
+                args = self.parser.parse_args(
+                    [
+                        "--with-license-files",
+                        f"--format={format_string}",
+                        "--with-notice-files",
+                        "--with-other-files",
+                        "--with-sbom-files",
+                    ]
+                )
                 fields = get_output_fields(args)
                 self.assertEqual(
-                    ["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields
+                    [
+                        "Name",
+                        "Version",
+                        "License",
+                        "LicenseFiles",
+                        "LicenseTexts",
+                        "NoticeFiles",
+                        "NoticeTexts",
+                        "OtherFiles",
+                        "OtherTexts",
+                        "SbomFiles",
+                        "SbomTexts",
+                    ],
+                    fields,
                 )
 
         for format_string in ["plain", "csv", "html"]:
             with self.subTest(format_string=format_string):
-                args = self.parser.parse_args(["--with-license-files", f"--format={format_string}", "--with-notice-files", "--with-other-files"])
+                args = self.parser.parse_args(
+                    [
+                        "--with-license-files",
+                        f"--format={format_string}",
+                        "--with-notice-files",
+                        "--with-other-files",
+                        "--with-sbom-files",
+                    ]
+                )
                 fields = get_output_fields(args)
                 self.assertEqual(["Name", "Version", "License"], fields)
 
@@ -379,10 +408,14 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
                 "--format=json",
                 "--with-notice-files",
                 "--with-other-files",
+                "--with-sbom-files",
             ]
         )
         fields = get_output_fields(args)
-        self.assertEqual(["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts"], fields)
+        self.assertEqual(
+            ["Name", "Version", "License", "LicenseFiles", "LicenseTexts", "NoticeFiles", "NoticeTexts", "OtherFiles", "OtherTexts", "SbomFiles", "SbomTexts"],
+            fields,
+        )
 
         args = self.parser.parse_args(
             [
@@ -390,8 +423,9 @@ class GetOutputFieldsTestCase(CommandLineTestCase):
                 "--format=json",
                 "--with-notice-files",
                 "--with-other-files",
+                "--with-sbom-files",
                 "--no-license-path",
             ]
         )
         fields = get_output_fields(args)
-        self.assertEqual(["Name", "Version", "License", "LicenseTexts", "NoticeTexts", "OtherTexts"], fields)
+        self.assertEqual(["Name", "Version", "License", "LicenseTexts", "NoticeTexts", "OtherTexts", "SbomTexts"], fields)

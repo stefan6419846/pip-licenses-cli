@@ -53,6 +53,8 @@ FIELDS_TO_METADATA_KEYS = {
     "NoticeTexts": "notice_texts",
     "OtherFiles": "other_files",
     "OtherTexts": "other_texts",
+    "SbomFiles": "sbom_files",
+    "SbomTexts": "sbom_texts",
     "Description": "summary",
 }
 
@@ -67,6 +69,8 @@ _MULTI_VALUE_KEYS = {
     "NoticeTexts",
     "OtherFiles",
     "OtherTexts",
+    "SbomFiles",
+    "SbomTexts",
 }
 
 

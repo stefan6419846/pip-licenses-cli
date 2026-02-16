@@ -38,7 +38,7 @@ def parse_licenses_list(licenses_str: str | None) -> list[str]:
 
 
 def _should_include_files(args: CustomNamespace) -> bool:
-    return args.with_license_file or args.with_license_files or args.with_notice_file or args.with_notice_files or args.with_other_files
+    return args.with_license_file or args.with_license_files or args.with_notice_file or args.with_notice_files or args.with_other_files or args.with_sbom_files
 
 
 def get_packages(
