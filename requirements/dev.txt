@@ -10,7 +10,7 @@ license-expression==30.4.4
 mypy==1.19.1
 mypy-extensions==1.1.0
 pep8-naming==0.15.1
-pip-licenses-lib==1.0.0
+pip-licenses-lib==1.1.0
 prettytable==3.17.0
 setuptools==82.0.0
 tomli==2.4.0 ; python_version < "3.11"
