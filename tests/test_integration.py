@@ -406,7 +406,7 @@ class IntegrationTestCase(CommandLineTestCase):
             create_licenses_table(args)
 
         self.assertIn("license MIT License not in allow-only licenses was found for package", captured.stderr)
-        self.assertIn("license BSD License not in allow-only licenses was found for package", captured.stderr)
+        self.assertIn("license BSD-3-Clause not in allow-only licenses was found for package", captured.stderr)
 
     def test_allow_only_partial(self) -> None:
         licenses = (
