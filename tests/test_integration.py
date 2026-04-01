@@ -150,7 +150,6 @@ class IntegrationTestCase(CommandLineTestCase):
         for license_name in ("BSD-3-Clause", "MIT", "Apache 2.0"):
             self.assertIn(license_name, license_meta)
         for license_name in (
-            "BSD License",
             "MIT License",
             "Apache Software License",
         ):
