@@ -15,6 +15,9 @@ This is a fork of the original [pip-licenses](https://github.com/raimon49/pip-li
 `pip-licenses-cli` is usable as a drop-in replacement for `pip-licenses<=5.0.0`. More recent versions might be compatible, but use a
 partially different code base and possibly other/additional parameters for example.
 
+The initial goal was to provide a drop-in replacement for the unmaintained `pip-licenses` package. In the meantime, the original package
+got a new maintainer. This fork will continue to be maintained as usual.
+
 ## Installation
 
 You can install this package from PyPI:
