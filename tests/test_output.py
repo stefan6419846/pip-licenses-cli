@@ -5,9 +5,8 @@
 from docutils.frontend import get_default_settings
 from docutils.parsers.rst import Parser
 from docutils.utils import new_document
-from prettytable import HRuleStyle
-
 from piplicenses_lib import LICENSE_UNKNOWN
+from prettytable import HRuleStyle
 
 from piplicenses.output import _handle_multiple_value_field, create_licenses_table, factory_styled_table_with_args
 from tests import PatchDistributionsTestCase

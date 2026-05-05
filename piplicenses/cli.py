@@ -49,6 +49,7 @@ class CustomNamespace(argparse.Namespace):
     with_notice_files: bool
     with_other_files: bool
     with_sbom_files: bool
+    omit_non_metadata_files: bool
     filter_strings: bool
     filter_code_page: str
     partial_match: bool
@@ -484,6 +485,12 @@ def create_parser(
         action="store_true",
         default=config_from_file.get("with-sbom-files", False),
         help="I|when specified together with option -l or --with-license-files, dump with location of SBOM files and contents",
+    )
+    format_options.add_argument(
+        "--omit-non-metadata-files",
+        action="store_true",
+        default=config_from_file.get("omit-non-metadata-files", False),
+        help="skip files which are not part of the metadata directory",
     )
     format_options.add_argument(
         "--filter-strings",

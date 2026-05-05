@@ -401,6 +401,11 @@ To emit all files in JSON and *plain-vertical* mode (instead of just the first o
 
 **Note:** If you want to keep the corresponding file paths secret, specify `--no-license-path` option as well.
 
+**Note:** Files are usually returned in the order specified inside the corresponding metadata file, see
+[discussions here](https://github.com/raimon49/pip-licenses/issues/330#issuecomment-4370812781). Especially when requesting a single
+file only, this might find license files inside the package itself. In these cases (or when you only care about the files inside the
+metadata directory of the package), consider using the `--omit-non-metadata-files` option.
+
 #### Option: filter\-strings
 
 Some package data contains Unicode characters which might cause problems for certain output formats (in particular ReST tables). If this filter

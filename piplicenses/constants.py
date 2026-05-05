@@ -73,6 +73,13 @@ _MULTI_VALUE_KEYS = {
     "SbomTexts",
 }
 
+_FILE_ATTRIBUTES = {
+    "licenses",
+    "notices",
+    "others",
+    "sboms",
+}
+
 
 SYSTEM_PACKAGES = [
     __pkgname__,

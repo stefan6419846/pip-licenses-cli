@@ -7,11 +7,11 @@ from __future__ import annotations
 from collections import Counter
 from typing import TYPE_CHECKING, cast
 
-from piplicenses_lib import LICENSE_UNKNOWN
+from piplicenses_lib import LICENSE_UNKNOWN, PackageInfo
 from prettytable import HRuleStyle, PrettyTable
 
 from piplicenses.collector import get_packages
-from piplicenses.constants import _MULTI_VALUE_KEYS, DEFAULT_OUTPUT_FIELDS, FIELDS_TO_METADATA_KEYS, SUMMARY_FIELD_NAMES
+from piplicenses.constants import _FILE_ATTRIBUTES, _MULTI_VALUE_KEYS, DEFAULT_OUTPUT_FIELDS, FIELDS_TO_METADATA_KEYS, SUMMARY_FIELD_NAMES
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterator, Sequence
@@ -27,6 +27,14 @@ def _handle_multiple_value_field(key: str, value: Iterator[str]) -> str | list[s
     return cast(str, next(value, LICENSE_UNKNOWN))
 
 
+def _filter_files(package: PackageInfo, args: CustomNamespace) -> None:
+    if not args.omit_non_metadata_files:
+        return
+    for name in _FILE_ATTRIBUTES:
+        new_value = [(filename, content) for filename, content in getattr(package, name) if package.is_metadata_file(filename)]
+        setattr(package, name, new_value)
+
+
 def create_licenses_table(
     args: CustomNamespace,
     output_fields: Sequence[str] = DEFAULT_OUTPUT_FIELDS,
@@ -34,6 +42,7 @@ def create_licenses_table(
     table = factory_styled_table_with_args(args, output_fields)
 
     for pkg in get_packages(args):
+        _filter_files(package=pkg, args=args)
         row: list[str | list[str]] = []
         for field in output_fields:
             if field == "License":
@@ -68,11 +77,11 @@ class JsonPrettyTable(PrettyTable):
     """PrettyTable-like class exporting to JSON"""
 
     def format_row(self, row: RowType) -> dict[str, str | list[str]]:
-        resrow: dict[str, str | list[str]] = {}
+        result_row: dict[str, str | list[str]] = {}
         for field, value in zip(self._field_names, row):
-            resrow[field] = value
+            result_row[field] = value
 
-        return resrow
+        return result_row
 
     def get_string(self, **kwargs: str | list[str]) -> str:
         # import included here in order to limit dependencies
@@ -88,18 +97,18 @@ class JsonPrettyTable(PrettyTable):
 
 class JsonLicenseFinderTable(JsonPrettyTable):
     def format_row(self, row: RowType) -> dict[str, str | list[str]]:
-        resrow: dict[str, str | list[str]] = {}
+        result_row: dict[str, str | list[str]] = {}
         for field, value in zip(self._field_names, row):
             if field == "Name":
-                resrow["name"] = value
+                result_row["name"] = value
 
             if field == "Version":
-                resrow["version"] = value
+                result_row["version"] = value
 
             if field == "License":
-                resrow["licenses"] = [value]
+                result_row["licenses"] = [value]
 
-        return resrow
+        return result_row
 
     def get_string(self, **kwargs: str | list[str]) -> str:
         # import included here in order to limit dependencies

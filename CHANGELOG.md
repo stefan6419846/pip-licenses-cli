@@ -1,5 +1,7 @@
 # Development Version
 
+* Allow omitting files which are not part of the corresponding metadata directory.
+
 # Version 4.0.0 - 2026-02-16
 
 * Add support for retrieving SBOM files (PEP 770).
