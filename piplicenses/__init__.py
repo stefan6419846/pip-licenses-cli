@@ -24,5 +24,5 @@
 # SOFTWARE.
 
 __pkgname__ = "pip-licenses-cli"
-__version__ = "4.0.0"
+__version__ = "4.1.0"
 __summary__ = "Dump the software license list of Python packages installed with pip."

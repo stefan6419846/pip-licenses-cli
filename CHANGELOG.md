@@ -1,5 +1,7 @@
 # Development Version
 
+# Version 4.1.0 - 2026-05-06
+
 * Allow omitting files which are not part of the corresponding metadata directory.
 
 # Version 4.0.0 - 2026-02-16
