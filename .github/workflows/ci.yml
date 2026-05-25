@@ -30,7 +30,7 @@ jobs:
         run:
           python -m pip install --upgrade pip wheel
       - name: Lint with black
-        uses: psf/black@c6755bb741b6481d6b3d3bb563c83fa060db96c9  # 26.3.1
+        uses: psf/black@87928e6d6761a4a6d22250e1fee5601b3998086e  # 26.5.1
         with:
           options: "--check --diff"
       - name: Install dependencies
