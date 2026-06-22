@@ -1,7 +1,7 @@
 black==26.5.1
 boolean-py==5.0
 coverage[toml]==7.14.1
-cryptography==48.0.1
+cryptography==49.0.0
 docutils==0.23
 flake8==7.3.0
 flake8-bugbear==25.11.29
