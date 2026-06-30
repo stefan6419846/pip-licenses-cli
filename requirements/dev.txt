@@ -11,7 +11,7 @@ mypy==2.1.0
 mypy-extensions==1.1.0
 pep8-naming==0.15.1
 pip-licenses-lib==1.2.2
-prettytable==3.17.0
+prettytable==3.18.0
 setuptools==82.0.1
 tomli==2.4.1 ; python_version < "3.11"
 tomli-w==1.2.0
