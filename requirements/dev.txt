@@ -16,5 +16,5 @@ setuptools==83.0.0
 tomli==2.4.1 ; python_version < "3.11"
 tomli-w==1.2.0
 twine==6.2.0
-types-docutils==0.22.3.20260518
+types-docutils==0.22.3.20260712
 wheel==0.47.0
