@@ -12,7 +12,7 @@ mypy-extensions==1.1.0
 pep8-naming==0.15.1
 pip-licenses-lib==1.2.2
 prettytable==3.18.0
-setuptools==83.0.0
+setuptools==84.0.0
 tomli==2.4.1 ; python_version < "3.11"
 tomli-w==1.2.0
 twine==7.0.0
