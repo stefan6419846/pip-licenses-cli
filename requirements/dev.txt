@@ -5,7 +5,7 @@ cryptography==50.0.1
 docutils==0.23
 flake8==7.3.0
 flake8-bugbear==25.11.29
-isort==8.0.1
+isort==9.0.0
 license-expression==30.4.4
 mypy==2.3.1
 mypy-extensions==1.1.0
